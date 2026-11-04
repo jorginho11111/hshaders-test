@@ -1,0 +1,72 @@
+# Mellow for Horizon
+
+A conversion of **Mellow Shaders** — the painterly, gameplay-first Iris/OptiFine
+shaderpack by **TheCMK** (<https://codeberg.org/TheCMK/mellow-shader>, MIT) — to
+the **Horizon shader API** (WGSL, `horizon-shaders.toml` schema 1).
+
+Mellow's look comes from its colour grading, soft bloom, shaped lightmap and
+wavy world. Those became Horizon stages: a painterly `[sky]`, a `[vertex]` that
+sways plants and rolls water, a `[material]` that shapes the light, a soft
+`[weather]`, and two `[[post]]` passes (bloom, then tone map and grade).
+
+## Using it
+
+Put this folder (or `mellow-0.1.0.hshader`) in `shaderpacks/` beside
+`options.txt`, then pick **Mellow** on Options > Horizon Settings > Shader
+Packs. Every knob of the original that maps to this API is on the pack's
+options page, named after the `#define` it came from.
+
+## What was converted
+
+| Mellow (GLSL) | Here (WGSL) |
+| --- | --- |
+| `final.fsh` grade: vibrance 1.2, saturation 1.0, contrast 1.0 | `post_grade.wgsl`, same formulas and defaults |
+| Tone maps (8 operators; default `TONEMAP_OPERATOR 6` = Uchimura) | `shared.wgsl`: Uchimura (default), AgX Punchy, ACES |
+| Vignette (`VIGNETTE_FALLOFF 0.75`, `VIGNETTE_OPACITY 0`, off by default) | `post_grade.wgsl`, same formula and defaults |
+| Film grain (`FILM_GRAIN` off, `FILM_GRAIN_STRENGTH 0.05`) | `post_grade.wgsl`, off by default |
+| The always-on dither of `final.fsh` | `post_grade.wgsl` |
+| Bloom (`BLOOM_STRENGTH 0.4`, `BLOOM_CURVE 0.5`) | `post_glow.wgsl` (two-ring halo) |
+| Wavy plants/leaves (`WAVE_AMPLITUDE 0.1`, `WAVE_SPEED 0.75`, `WAVE_SIZE 1.5`, `WAVE_LEAVES`) and wavy water | `vertex.wgsl`, same defaults |
+| `RAIN_TILT_STRENGTH 1.2` | `vertex.wgsl` (lean on wet ground, eased by `frame.wetness`) |
+| Lightmap shadows (`LM_FALLOFF_CURVE 1.6`) and `MIN_LIGHT_AMOUNT 0.15` | `material.wgsl` |
+| Adjustable light colours (`LM_RED/GREEN/BLUE`) | `material.wgsl` options |
+| Handheld lights (`HANDHELD_LIGHTS`, `HANDHELD_FALLOFF_CURVE 1.4`) | `material.wgsl`, off by default like Mellow |
+| Reflections on water | `material.wgsl` + `[reflection]` |
+| `ATM_FOG_STRENGTH 0.25` ambient fog | `material.wgsl` |
+| Rainy sky (`RAIN_SKY_DESATURATION 0.5`, `RAIN_SKY_DARKENING 0.33`) | `sky.wgsl` |
+| Clouds (`CLOUD_AMOUNT 22`, `CLOUD_OPACITY 0.24`, `CLOUD_SPEED 2`) | `sky.wgsl`, its own soft clouds |
+| Shader stars (`STAR_STRENGTH 0.5`) and aurora (`AURORA_STRENGTH 0.2`) | `sky.wgsl` |
+| Weather streaks | `weather.wgsl` |
+
+## What did not convert (and why)
+
+- **Shadow map, SSAO, god rays, DOF, TAA/SMAA, motion blur, CAS/dynamic
+  sharpening, chromatic aberration, outlines** — extra passes and buffers this
+  API has no stage for (a pack changes how things look, not how they are
+  drawn). The look leans on the shaped lightmap instead, like Mellow's own
+  "lightmap based shadows".
+- **Coloured lights (`COLORED_LIGHTS`), PBR/POM, puddles, seasons, rainbows,
+  Purkinje effect, colour balance, channel mixer, LUTs** — off or neutral in
+  Mellow's own defaults, or needing data this API does not expose yet.
+- **Distant Horizons, per-dimension `world*` programs** — Horizon's
+  `frame.dimension` covers the basics only.
+- **`EXPOSURE 1.7`** — that value belongs to Mellow's internal linear pipeline;
+  the `exposure` option here starts at 1.1, which suits this one.
+
+## Rules this pack follows
+
+No bindings, no entry points, no `horizon_` names; every `override` is an
+option of the manifest and every option is used; within the budgets of the
+check (20 000 expressions and 64 texture reads a stage).
+
+## Credits
+
+- **Mellow Shaders** by TheCMK — MIT, <https://codeberg.org/TheCMK/mellow-shader>.
+  The formulas, defaults and option names in this pack come from it.
+- Tone map operators from **dmnsgn/glsl-tone-map** (MIT, Copyright (C) 2019
+  Damien Seguin): Uchimura 2017, and the fitted ACES curve.
+- The **AgX** minimal implementation after Benjamin Wrensch (iolite-engine),
+  with the matrices of **Google Filament** (Apache 2.0) and EaryChow's AgX LUT
+  generator; the "Punchy" look parameters are Mellow's.
+- The bloom pass follows the pattern of Horizon's own `golden_hour` example
+  pack (MIT, Horizon).

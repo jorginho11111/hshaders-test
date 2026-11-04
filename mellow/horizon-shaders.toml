@@ -1,0 +1,413 @@
+# Mellow for Horizon — a conversion of Mellow Shaders (Iris/OptiFine, GLSL)
+# to the Horizon shader API (WGSL), schema 1.
+# Original: "Mellow" by TheCMK, https://codeberg.org/TheCMK/mellow-shader (MIT).
+schema = 1
+id = "mellow"
+name = "Mellow"
+version = "0.1.0"
+api = "0.1"
+description = "A painterly, gameplay-first conversion of Mellow Shaders: vivid colour grading, soft bloom, wavy foliage and water, its own clouds, stars and aurora."
+authors = ["TheCMK (original Mellow shaderpack)", "Horizon WGSL conversion"]
+license = "MIT"
+shared = ["shared.wgsl"]
+
+[sky]
+file = "sky.wgsl"
+name = "Painterly sky"
+clouds = false
+sun = true
+stars = false
+
+[material]
+file = "material.wgsl"
+name = "Mellow lighting"
+
+[vertex]
+file = "vertex.wgsl"
+
+[weather]
+file = "weather.wgsl"
+
+[[post]]
+file = "post_glow.wgsl"
+name = "Bloom"
+
+[[post]]
+file = "post_grade.wgsl"
+name = "Tone map and grade"
+
+# --- Sky (Mellow's clouds, stars, aurora, rainy sky) ---
+
+[[options]]
+id = "sky_warmth"
+name = "Sky warmth"
+description = "How warm the sky turns around a low sun (Mellow's painterly sunrise and sunset)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "rain_sky_desaturation"
+name = "Rain sky desaturation"
+description = "How grey the sky goes while it rains (RAIN_SKY_DESATURATION)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "rain_sky_darkening"
+name = "Rain sky darkening"
+description = "How dark the sky goes while it rains (RAIN_SKY_DARKENING)."
+type = "float"
+default = 0.33
+min = 0.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "cloud_opacity"
+name = "Cloud opacity"
+description = "How strongly Mellow's soft clouds show (CLOUD_OPACITY)."
+type = "float"
+default = 0.24
+min = 0.0
+max = 0.4
+step = 0.02
+
+[[options]]
+id = "cloud_amount"
+name = "Cloud amount"
+description = "How much of the sky the clouds cover (CLOUD_AMOUNT)."
+type = "int"
+default = 22
+min = 12
+max = 26
+
+[[options]]
+id = "cloud_speed"
+name = "Cloud speed"
+description = "How fast the clouds drift (CLOUD_SPEED)."
+type = "int"
+default = 2
+min = 0
+max = 6
+
+[[options]]
+id = "aurora"
+name = "Aurora"
+description = "Mellow's aurora borealis at night (AURORA_BOREALIS)."
+type = "bool"
+default = true
+
+[[options]]
+id = "aurora_strength"
+name = "Aurora strength"
+description = "How bright the aurora hangs (AURORA_STRENGTH)."
+type = "float"
+default = 0.2
+min = 0.1
+max = 0.5
+step = 0.05
+
+[[options]]
+id = "star_strength"
+name = "Star strength"
+description = "How bright Mellow's own stars are (STAR_STRENGTH)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 2.0
+step = 0.25
+
+# --- Wavy world (WAVY_PLANTS, WAVE_LEAVES, water, RAIN_TILT) ---
+
+[[options]]
+id = "wave_amplitude"
+name = "Wave amplitude"
+description = "How far plants and water sway (WAVE_AMPLITUDE)."
+type = "float"
+default = 0.1
+min = 0.025
+max = 0.3
+step = 0.025
+
+[[options]]
+id = "wave_speed"
+name = "Wave speed"
+description = "How fast the waves move (WAVE_SPEED)."
+type = "float"
+default = 0.75
+min = 0.25
+max = 2.0
+step = 0.05
+
+[[options]]
+id = "wave_size"
+name = "Wave size"
+description = "The length of the waves (WAVE_SIZE)."
+type = "float"
+default = 1.5
+min = 0.25
+max = 5.0
+step = 0.25
+
+[[options]]
+id = "wave_leaves"
+name = "Wavy leaves"
+description = "Leaves stir with the plants (WAVE_LEAVES)."
+type = "bool"
+default = true
+
+[[options]]
+id = "wave_water"
+name = "Wavy water"
+description = "The top of water rolls gently."
+type = "bool"
+default = true
+
+[[options]]
+id = "rain_tilt"
+name = "Rain tilt"
+description = "How far plants lean with the wind on wet ground (RAIN_TILT_STRENGTH)."
+type = "float"
+default = 1.2
+min = 0.5
+max = 1.5
+step = 0.1
+
+# --- Lighting (lightmap shadows, light colours, handheld lights, reflections) ---
+
+[[options]]
+id = "light_falloff"
+name = "Light falloff"
+description = "The lightmap's falloff curve (LM_FALLOFF_CURVE): steeper means deeper shade under cover."
+type = "float"
+default = 1.6
+min = 1.0
+max = 2.0
+step = 0.1
+
+[[options]]
+id = "min_light"
+name = "Minimum light"
+description = "How bright the darkest places stay (MIN_LIGHT_AMOUNT)."
+type = "float"
+default = 0.15
+min = 0.0
+max = 0.4
+step = 0.01
+
+[[options]]
+id = "light_red"
+name = "Light colour: red"
+description = "Shifts the colour of the light itself (LM_RED)."
+type = "float"
+default = 0.0
+min = -1.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "light_green"
+name = "Light colour: green"
+description = "Shifts the colour of the light itself (LM_GREEN)."
+type = "float"
+default = 0.0
+min = -1.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "light_blue"
+name = "Light colour: blue"
+description = "Shifts the colour of the light itself (LM_BLUE)."
+type = "float"
+default = 0.0
+min = -1.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "handheld_lights"
+name = "Handheld lights"
+description = "Held and dropped items light the world around them (HANDHELD_LIGHTS, off by default like Mellow)."
+type = "bool"
+default = false
+
+[[options]]
+id = "handheld_falloff"
+name = "Handheld light falloff"
+description = "How tightly handheld light pools (HANDHELD_FALLOFF_CURVE)."
+type = "float"
+default = 1.4
+min = 0.0
+max = 2.0
+step = 0.2
+
+[[options]]
+id = "reflections"
+name = "Water reflections"
+description = "The world mirrors on the top of water."
+type = "bool"
+default = true
+
+[[options]]
+id = "reflection_strength"
+name = "Reflection strength"
+description = "How much of the mirror shows on water."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "atmospheric_fog"
+name = "Atmospheric fog"
+description = "Mellow's soft ambient haze that closes in with distance (ATM_FOG_STRENGTH)."
+type = "float"
+default = 0.25
+min = 0.0
+max = 0.5
+step = 0.01
+
+# --- Weather ---
+
+[[options]]
+id = "weather_opacity"
+name = "Weather opacity"
+description = "How strongly rain and snow streaks show."
+type = "float"
+default = 1.0
+min = 0.1
+max = 1.0
+step = 0.05
+
+# --- Bloom (BLOOM_STRENGTH, BLOOM_CURVE) ---
+
+[[options]]
+id = "bloom_strength"
+name = "Bloom strength"
+description = "The soft halo around bright things (BLOOM_STRENGTH)."
+type = "float"
+default = 0.4
+min = 0.0
+max = 0.8
+step = 0.02
+
+[[options]]
+id = "bloom_curve"
+name = "Bloom curve"
+description = "Where bloom starts to pick up brightness (BLOOM_CURVE)."
+type = "float"
+default = 0.5
+min = 0.1
+max = 1.0
+step = 0.05
+
+# --- Tone map and colour grade (Mellow's final pass) ---
+
+[[options]]
+id = "tonemap"
+name = "Tone mapping"
+description = "Uchimura is Mellow's default operator; AgX Punchy and the fitted ACES curve are two of its others."
+type = "choice"
+values = ["Uchimura", "AgX Punchy", "ACES", "None"]
+default = "Uchimura"
+
+[[options]]
+id = "exposure"
+name = "Exposure"
+description = "Brightness before tone mapping."
+type = "float"
+default = 1.1
+min = 0.5
+max = 2.0
+step = 0.05
+
+[[options]]
+id = "vibrance"
+name = "Vibrance"
+description = "Lifts quiet colours without overdoing strong ones (VIBRANCE)."
+type = "float"
+default = 1.2
+min = 0.0
+max = 2.0
+step = 0.02
+
+[[options]]
+id = "saturation"
+name = "Saturation"
+description = "How colourful the picture is (SATURATION)."
+type = "float"
+default = 1.0
+min = 0.0
+max = 2.0
+step = 0.02
+
+[[options]]
+id = "contrast"
+name = "Contrast"
+description = "Punches the picture up or softens it (CONTRAST)."
+type = "float"
+default = 1.0
+min = 0.5
+max = 1.5
+step = 0.01
+
+[[options]]
+id = "vignette_opacity"
+name = "Vignette"
+description = "Darkens the corners of the picture (VIGNETTE_OPACITY, 0 turns it off)."
+type = "float"
+default = 0.0
+min = 0.0
+max = 2.0
+step = 0.25
+
+[[options]]
+id = "vignette_falloff"
+name = "Vignette falloff"
+description = "How far the vignette reaches in (VIGNETTE_FALLOFF)."
+type = "float"
+default = 0.75
+min = 0.0
+max = 1.5
+step = 0.25
+
+[[options]]
+id = "film_grain"
+name = "Film grain"
+description = "A whisper of grain over the picture (FILM_GRAIN, off by default like Mellow)."
+type = "bool"
+default = false
+
+[[options]]
+id = "film_grain_strength"
+name = "Film grain strength"
+description = "How loud the grain is (FILM_GRAIN_STRENGTH)."
+type = "float"
+default = 0.05
+min = 0.025
+max = 0.2
+step = 0.025
+
+# --- Sprite ids for the wavy world ---
+
+[[materials]]
+id = 1
+sprites = ["block/*_leaves"]
+
+[[materials]]
+id = 2
+sprites = ["block/*_sapling", "block/short_grass", "block/tall_grass_*", "block/fern", "block/large_fern_*", "block/vine", "block/sugar_cane", "block/wheat_stage*", "block/carrots_stage*", "block/potatoes_stage*", "block/beetroots_stage*", "block/dandelion", "block/poppy", "block/blue_orchid", "block/allium", "block/azure_bluet", "block/*_tulip", "block/oxeye_daisy", "block/cornflower", "block/lily_of_the_valley"]
+
+[reflection]
+option = "reflections"
+
+[budget]
+gpu_ms = 1.5

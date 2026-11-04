@@ -9,7 +9,7 @@ a `horizon-shaders.toml` manifest; see
 
 | Pack | Source | What it is |
 | --- | --- | --- |
-| [`mellow/`](mellow/) | [Mellow Shaders](https://codeberg.org/TheCMK/mellow-shader) by TheCMK (Iris/OptiFine, MIT) | A painterly, gameplay-first shaderpack converted to the Horizon shader API: its colour grading (vibrance 1.2, Uchimura tone map), soft bloom, shaped-lightmap shading, wavy foliage and water, its own clouds, stars and aurora. Ready to drop in `shaderpacks/` — the folder, or `mellow-0.1.0.hshader`. |
+| [`mellow/`](mellow/) | [Mellow Shaders](https://codeberg.org/TheCMK/mellow-shader) by TheCMK (Iris/OptiFine, MIT) | A painterly, gameplay-first shaderpack converted to the Horizon shader API: its colour grading (vibrance 1.2, Uchimura tone map), soft bloom, shaped-lightmap shading, its own clouds, stars and aurora. Ready to drop in `shaderpacks/` — the folder, or `mellow-0.1.1.hshader`. Built against the API surface of Horizon Android 0.7.7 (sky, material, weather and post stages). |
 
 ## How a conversion goes
 

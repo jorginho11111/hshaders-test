@@ -1,16 +1,14 @@
 // Mellow's lighting of block surfaces: the lightmap shaped by LM_FALLOFF_CURVE
 // (its "lightmap based shadows" — shade under cover goes deeper), MIN_LIGHT_AMOUNT
-// so nothing is pitch black, the adjustable light colours (LM_RED/GREEN/BLUE),
-// handheld lights and the water mirror. Vanilla's own surface is
-// albedo * tint * vec4(lightmap, 1.0); this changes only what the light means.
+// so nothing is pitch black, the adjustable light colours (LM_RED/GREEN/BLUE) and
+// the water mirror. Vanilla's own surface is albedo * tint * vec4(lightmap, 1.0);
+// this changes only what the light means.
 
 override light_falloff: f32 = 1.6;
 override min_light: f32 = 0.15;
 override light_red: f32 = 0.0;
 override light_green: f32 = 0.0;
 override light_blue: f32 = 0.0;
-override handheld_lights: bool = false;
-override handheld_falloff: f32 = 1.4;
 override reflections: bool = true;
 override reflection_strength: f32 = 0.5;
 override atmospheric_fog: f32 = 0.25;
@@ -25,13 +23,6 @@ fn material(input: MaterialInput) -> Surface {
 
     // "Fully adjustable light colors": shifts the colour of the light itself.
     light = light * (vec3<f32>(1.0) + vec3<f32>(light_red, light_green, light_blue));
-
-    // HANDHELD_LIGHTS: held and dropped items and coloured lights around,
-    // shaped by HANDHELD_FALLOFF_CURVE.
-    if (handheld_lights) {
-        let held = pow(max(input.colored_light, vec3<f32>(0.0)), vec3<f32>(handheld_falloff));
-        light = light + held;
-    }
 
     let lit = input.albedo * input.tint * vec4<f32>(light, 1.0);
     var color = lit.rgb;

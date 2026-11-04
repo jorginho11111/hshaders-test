@@ -1,12 +1,14 @@
 # Mellow for Horizon — a conversion of Mellow Shaders (Iris/OptiFine, GLSL)
 # to the Horizon shader API (WGSL), schema 1.
 # Original: "Mellow" by TheCMK, https://codeberg.org/TheCMK/mellow-shader (MIT).
+# Targets the API surface of Horizon Android 0.7.7 (sky, material, weather and
+# post stages; no [vertex] stage and no MaterialInput.colored_light on that build).
 schema = 1
 id = "mellow"
 name = "Mellow"
-version = "0.1.0"
+version = "0.1.1"
 api = "0.1"
-description = "A painterly, gameplay-first conversion of Mellow Shaders: vivid colour grading, soft bloom, wavy foliage and water, its own clouds, stars and aurora."
+description = "A painterly, gameplay-first conversion of Mellow Shaders: vivid colour grading, soft bloom, its own clouds, stars and aurora."
 authors = ["TheCMK (original Mellow shaderpack)", "Horizon WGSL conversion"]
 license = "MIT"
 shared = ["shared.wgsl"]
@@ -21,9 +23,6 @@ stars = false
 [material]
 file = "material.wgsl"
 name = "Mellow lighting"
-
-[vertex]
-file = "vertex.wgsl"
 
 [weather]
 file = "weather.wgsl"
@@ -123,63 +122,7 @@ min = 0.0
 max = 2.0
 step = 0.25
 
-# --- Wavy world (WAVY_PLANTS, WAVE_LEAVES, water, RAIN_TILT) ---
-
-[[options]]
-id = "wave_amplitude"
-name = "Wave amplitude"
-description = "How far plants and water sway (WAVE_AMPLITUDE)."
-type = "float"
-default = 0.1
-min = 0.025
-max = 0.3
-step = 0.025
-
-[[options]]
-id = "wave_speed"
-name = "Wave speed"
-description = "How fast the waves move (WAVE_SPEED)."
-type = "float"
-default = 0.75
-min = 0.25
-max = 2.0
-step = 0.05
-
-[[options]]
-id = "wave_size"
-name = "Wave size"
-description = "The length of the waves (WAVE_SIZE)."
-type = "float"
-default = 1.5
-min = 0.25
-max = 5.0
-step = 0.25
-
-[[options]]
-id = "wave_leaves"
-name = "Wavy leaves"
-description = "Leaves stir with the plants (WAVE_LEAVES)."
-type = "bool"
-default = true
-
-[[options]]
-id = "wave_water"
-name = "Wavy water"
-description = "The top of water rolls gently."
-type = "bool"
-default = true
-
-[[options]]
-id = "rain_tilt"
-name = "Rain tilt"
-description = "How far plants lean with the wind on wet ground (RAIN_TILT_STRENGTH)."
-type = "float"
-default = 1.2
-min = 0.5
-max = 1.5
-step = 0.1
-
-# --- Lighting (lightmap shadows, light colours, handheld lights, reflections) ---
+# --- Lighting (lightmap shadows, light colours, reflections) ---
 
 [[options]]
 id = "light_falloff"
@@ -230,23 +173,6 @@ default = 0.0
 min = -1.0
 max = 1.0
 step = 0.01
-
-[[options]]
-id = "handheld_lights"
-name = "Handheld lights"
-description = "Held and dropped items light the world around them (HANDHELD_LIGHTS, off by default like Mellow)."
-type = "bool"
-default = false
-
-[[options]]
-id = "handheld_falloff"
-name = "Handheld light falloff"
-description = "How tightly handheld light pools (HANDHELD_FALLOFF_CURVE)."
-type = "float"
-default = 1.4
-min = 0.0
-max = 2.0
-step = 0.2
 
 [[options]]
 id = "reflections"
@@ -395,16 +321,6 @@ default = 0.05
 min = 0.025
 max = 0.2
 step = 0.025
-
-# --- Sprite ids for the wavy world ---
-
-[[materials]]
-id = 1
-sprites = ["block/*_leaves"]
-
-[[materials]]
-id = 2
-sprites = ["block/*_sapling", "block/short_grass", "block/tall_grass_*", "block/fern", "block/large_fern_*", "block/vine", "block/sugar_cane", "block/wheat_stage*", "block/carrots_stage*", "block/potatoes_stage*", "block/beetroots_stage*", "block/dandelion", "block/poppy", "block/blue_orchid", "block/allium", "block/azure_bluet", "block/*_tulip", "block/oxeye_daisy", "block/cornflower", "block/lily_of_the_valley"]
 
 [reflection]
 option = "reflections"

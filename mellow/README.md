@@ -5,16 +5,21 @@ shaderpack by **TheCMK** (<https://codeberg.org/TheCMK/mellow-shader>, MIT) — 
 the **Horizon shader API** (WGSL, `horizon-shaders.toml` schema 1).
 
 Mellow's look comes from its colour grading, soft bloom, shaped lightmap and
-wavy world. Those became Horizon stages: a painterly `[sky]`, a `[vertex]` that
-sways plants and rolls water, a `[material]` that shapes the light, a soft
-`[weather]`, and two `[[post]]` passes (bloom, then tone map and grade).
+sky work. Those became Horizon stages: a painterly `[sky]`, a `[material]` that
+shapes the light, a soft `[weather]`, and two `[[post]]` passes (bloom, then
+tone map and grade).
+
+This pack targets the API surface of **Horizon Android 0.7.7** (the sky,
+material, weather and post stages; that build has no `[vertex]` stage and no
+`MaterialInput.colored_light`).
 
 ## Using it
 
-Put this folder (or `mellow-0.1.0.hshader`) in `shaderpacks/` beside
-`options.txt`, then pick **Mellow** on Options > Horizon Settings > Shader
-Packs. Every knob of the original that maps to this API is on the pack's
-options page, named after the `#define` it came from.
+Put this folder (or `mellow-0.1.1.hshader`) in `shaderpacks/` beside
+`options.txt` (or import it from the launcher's Shaders page), then pick
+**Mellow** on Options > Horizon Settings > Shader Packs. Every knob of the
+original that maps to this API is on the pack's options page, named after the
+`#define` it came from.
 
 ## What was converted
 
@@ -26,11 +31,8 @@ options page, named after the `#define` it came from.
 | Film grain (`FILM_GRAIN` off, `FILM_GRAIN_STRENGTH 0.05`) | `post_grade.wgsl`, off by default |
 | The always-on dither of `final.fsh` | `post_grade.wgsl` |
 | Bloom (`BLOOM_STRENGTH 0.4`, `BLOOM_CURVE 0.5`) | `post_glow.wgsl` (two-ring halo) |
-| Wavy plants/leaves (`WAVE_AMPLITUDE 0.1`, `WAVE_SPEED 0.75`, `WAVE_SIZE 1.5`, `WAVE_LEAVES`) and wavy water | `vertex.wgsl`, same defaults |
-| `RAIN_TILT_STRENGTH 1.2` | `vertex.wgsl` (lean on wet ground, eased by `frame.wetness`) |
 | Lightmap shadows (`LM_FALLOFF_CURVE 1.6`) and `MIN_LIGHT_AMOUNT 0.15` | `material.wgsl` |
 | Adjustable light colours (`LM_RED/GREEN/BLUE`) | `material.wgsl` options |
-| Handheld lights (`HANDHELD_LIGHTS`, `HANDHELD_FALLOFF_CURVE 1.4`) | `material.wgsl`, off by default like Mellow |
 | Reflections on water | `material.wgsl` + `[reflection]` |
 | `ATM_FOG_STRENGTH 0.25` ambient fog | `material.wgsl` |
 | Rainy sky (`RAIN_SKY_DESATURATION 0.5`, `RAIN_SKY_DARKENING 0.33`) | `sky.wgsl` |
@@ -40,6 +42,12 @@ options page, named after the `#define` it came from.
 
 ## What did not convert (and why)
 
+- **Wavy plants, leaves and water (`WAVY_PLANTS`, `WAVE_LEAVES`, `RAIN_TILT`)** —
+  the `[vertex]` stage is not in this build's shader API (it exists on newer
+  desktop builds; the stage and its options are one manifest table away when
+  the app catches up).
+- **Handheld lights (`HANDHELD_LIGHTS`)** — needs `MaterialInput.colored_light`,
+  which this build does not upload yet.
 - **Shadow map, SSAO, god rays, DOF, TAA/SMAA, motion blur, CAS/dynamic
   sharpening, chromatic aberration, outlines** — extra passes and buffers this
   API has no stage for (a pack changes how things look, not how they are

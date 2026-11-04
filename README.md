@@ -11,6 +11,13 @@ a `horizon-shaders.toml` manifest; see
 | --- | --- | --- |
 | [`mellow/`](mellow/) | [Mellow Shaders](https://codeberg.org/TheCMK/mellow-shader) by TheCMK (Iris/OptiFine, MIT) | A painterly, gameplay-first shaderpack converted to the Horizon shader API: its colour grading (vibrance 1.2, Uchimura tone map), soft bloom, shaped-lightmap shading, its own clouds, stars and aurora. Ready to drop in `shaderpacks/` — the folder, or `mellow-0.1.1.hshader`. Built against the API surface of Horizon Android 0.7.7 (sky, material, weather and post stages). |
 
+## Status / depuração (Horizon Android 0.7.7)
+
+- **Release [mellow-v0.1.0](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.0)** — erro **[E1]**: `unknown field 'vertex'` na importação.
+- **Release [mellow-v0.1.1](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.1)** — **[E1]** corrigido; novo erro **[E2]**: o app fecha ao ativar o pack (sob investigação).
+- **`probes/`** — 4 sondas (sky / post / material / weather) para isolar qual estágio provoca o **[E2]**; instruções em `probes/README.md`.
+- Relatório de crash do app: `last-rust-panic.txt` (botão *Game files* do launcher → Reports).
+
 ## How a conversion goes
 
 1. **Map the effects to Horizon's stages**: `[sky]`, `[vertex]` (waving

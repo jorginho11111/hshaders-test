@@ -13,13 +13,27 @@ This pack targets the API surface of **Horizon Android 0.7.7** (the sky,
 material, weather and post stages; that build has no `[vertex]` stage and no
 `MaterialInput.colored_light`).
 
+## Status — v0.1.2 (erros por versão)
+
+| Versão | Erro no Horizon Android 0.7.7 |
+| --- | --- |
+| 0.1.0 | **[E1]** Import falhava: `unknown field 'vertex'` (TOML). |
+| 0.1.1 | **[E1]** corrigido · **[E2]** o app **fecha ao ativar** o pack. |
+| 0.1.2 | **[E2]** sob teste: workaround aplicado — o estágio `[material]` (+`[reflection]`) ficou **desativado** (é o principal suspeito: packs com material disparam um recarregamento de texturas LabPBR que packs sem material nunca fazem). `material.wgsl` continua no repositório para reativar depois. NaN no AgX Punchy corrigido (`pow`/`log2` de negativo). |
+
+Enquanto o **[E2]** não fecha: as sondas de bissecção (`probe-sky`, `probe-post`,
+`probe-material`, `probe-weather` — download direto na release) isolam qual
+estágio derruba o app, e o relatório `last-rust-panic.txt` (botão *Game files*
+do launcher → Reports) aponta a linha exata do panic.
+
 ## Using it
 
-Put this folder (or `mellow-0.1.1.hshader`) in `shaderpacks/` beside
-`options.txt` (or import it from the launcher's Shaders page), then pick
-**Mellow** on Options > Horizon Settings > Shader Packs. Every knob of the
-original that maps to this API is on the pack's options page, named after the
-`#define` it came from.
+Put this folder in `shaderpacks/` beside `options.txt`, or download
+`mellow-<version>.hshader` from the release's **Assets** (download direto) and
+import it from the launcher's Shaders page, then pick **Mellow** on
+Options > Horizon Settings > Shader Packs. Every knob of the original that maps
+to this API is on the pack's options page, named after the `#define` it came
+from.
 
 ## What was converted
 

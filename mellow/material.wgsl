@@ -3,6 +3,11 @@
 // so nothing is pitch black, the adjustable light colours (LM_RED/GREEN/BLUE) and
 // the water mirror. Vanilla's own surface is albedo * tint * vec4(lightmap, 1.0);
 // this changes only what the light means.
+//
+// *** DESATIVADO na v0.1.2 (workaround do erro E2 — crash ao ativar no Horizon
+// *** Android 0.7.7). O arquivo fica no repositório para reativar quando o crash
+// *** for isolado (ver probes/ e a release mellow-v0.1.2). Não é citado no
+// *** manifesto nem vai no .hshader.
 
 override light_falloff: f32 = 1.6;
 override min_light: f32 = 0.15;

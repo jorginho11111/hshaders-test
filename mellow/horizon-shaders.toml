@@ -1,12 +1,14 @@
 # Mellow for Horizon — a conversion of Mellow Shaders (Iris/OptiFine, GLSL)
 # to the Horizon shader API (WGSL), schema 1.
 # Original: "Mellow" by TheCMK, https://codeberg.org/TheCMK/mellow-shader (MIT).
-# Targets the API surface of Horizon Android 0.7.7 (sky, material, weather and
-# post stages; no [vertex] stage and no MaterialInput.colored_light on that build).
+# Targets the API surface of Horizon Android 0.7.7 (sky, weather and post
+# stages; no [vertex] stage and no MaterialInput.colored_light on that build).
+# v0.1.2: the [material] stage (material.wgsl) is disabled as a workaround for
+# the crash-on-enable (E2) on Horizon Android 0.7.7; the file stays in the repo.
 schema = 1
 id = "mellow"
 name = "Mellow"
-version = "0.1.1"
+version = "0.1.2"
 api = "0.1"
 description = "A painterly, gameplay-first conversion of Mellow Shaders: vivid colour grading, soft bloom, its own clouds, stars and aurora."
 authors = ["TheCMK (original Mellow shaderpack)", "Horizon WGSL conversion"]
@@ -19,10 +21,6 @@ name = "Painterly sky"
 clouds = false
 sun = true
 stars = false
-
-[material]
-file = "material.wgsl"
-name = "Mellow lighting"
 
 [weather]
 file = "weather.wgsl"
@@ -121,85 +119,6 @@ default = 0.5
 min = 0.0
 max = 2.0
 step = 0.25
-
-# --- Lighting (lightmap shadows, light colours, reflections) ---
-
-[[options]]
-id = "light_falloff"
-name = "Light falloff"
-description = "The lightmap's falloff curve (LM_FALLOFF_CURVE): steeper means deeper shade under cover."
-type = "float"
-default = 1.6
-min = 1.0
-max = 2.0
-step = 0.1
-
-[[options]]
-id = "min_light"
-name = "Minimum light"
-description = "How bright the darkest places stay (MIN_LIGHT_AMOUNT)."
-type = "float"
-default = 0.15
-min = 0.0
-max = 0.4
-step = 0.01
-
-[[options]]
-id = "light_red"
-name = "Light colour: red"
-description = "Shifts the colour of the light itself (LM_RED)."
-type = "float"
-default = 0.0
-min = -1.0
-max = 1.0
-step = 0.01
-
-[[options]]
-id = "light_green"
-name = "Light colour: green"
-description = "Shifts the colour of the light itself (LM_GREEN)."
-type = "float"
-default = 0.0
-min = -1.0
-max = 1.0
-step = 0.01
-
-[[options]]
-id = "light_blue"
-name = "Light colour: blue"
-description = "Shifts the colour of the light itself (LM_BLUE)."
-type = "float"
-default = 0.0
-min = -1.0
-max = 1.0
-step = 0.01
-
-[[options]]
-id = "reflections"
-name = "Water reflections"
-description = "The world mirrors on the top of water."
-type = "bool"
-default = true
-
-[[options]]
-id = "reflection_strength"
-name = "Reflection strength"
-description = "How much of the mirror shows on water."
-type = "float"
-default = 0.5
-min = 0.0
-max = 1.0
-step = 0.05
-
-[[options]]
-id = "atmospheric_fog"
-name = "Atmospheric fog"
-description = "Mellow's soft ambient haze that closes in with distance (ATM_FOG_STRENGTH)."
-type = "float"
-default = 0.25
-min = 0.0
-max = 0.5
-step = 0.01
 
 # --- Weather ---
 
@@ -321,9 +240,6 @@ default = 0.05
 min = 0.025
 max = 0.2
 step = 0.025
-
-[reflection]
-option = "reflections"
 
 [budget]
 gpu_ms = 1.5

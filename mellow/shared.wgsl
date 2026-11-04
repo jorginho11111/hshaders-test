@@ -89,7 +89,7 @@ fn agx_punchy(color_in: vec3<f32>) -> vec3<f32> {
     var color = srgb_to_2020 * color_in;
     color = inset * color;
     color = max(color, vec3<f32>(1e-10));
-    color = clamp(log2(color), vec3<f32>(min_ev), vec3<f32>(max_ev));
+    color = clamp(log2(max(color, vec3<f32>(1e-10))), vec3<f32>(min_ev), vec3<f32>(max_ev));
     color = (color - vec3<f32>(min_ev)) / (max_ev - min_ev);
     color = clamp(color, vec3<f32>(0.0), vec3<f32>(1.0));
 
@@ -100,7 +100,7 @@ fn agx_punchy(color_in: vec3<f32>) -> vec3<f32> {
         + 0.4298 * x2 + 0.1191 * color - vec3<f32>(0.00232);
 
     // The "Punchy" look: slope 1, offset 0, power 1.35, saturation 1.4.
-    color = pow(color, vec3<f32>(1.35));
+    color = pow(max(color, vec3<f32>(0.0)), vec3<f32>(1.35));
     let luma = get_luminance(color);
     color = vec3<f32>(luma) + 1.4 * (color - vec3<f32>(luma));
 

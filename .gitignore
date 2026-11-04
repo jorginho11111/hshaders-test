@@ -1,0 +1,2 @@
+# Built downloads (.hshader) go to GitHub releases, not the tree.
+dist/

@@ -4,6 +4,10 @@ O pacote **Mellow 0.1.1** importa e mostra as opções, mas o app **fecha ao ati
 (erro **[E2]** da release `mellow-v0.1.1`). Estas 4 sondas isolam **qual estágio** derruba
 o app. Cada uma é o código real do Mellow (mesmos `.wgsl`) com **um único estágio**.
 
+**Download direto:** os quatro `.hshader` estão como **Assets** da release
+[mellow-v0.1.2](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.2)
+(as fontes ficam aqui no repositório).
+
 ## Como testar (na ordem)
 
 Instale cada `.hshader` pelo botão **Import file** do launcher, ative-o no **jogo** e observe:

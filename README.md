@@ -13,10 +13,19 @@ a `horizon-shaders.toml` manifest; see
 
 ## Status / depuração (Horizon Android 0.7.7)
 
-- **Release [mellow-v0.1.0](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.0)** — erro **[E1]**: `unknown field 'vertex'` na importação.
-- **Release [mellow-v0.1.1](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.1)** — **[E1]** corrigido; novo erro **[E2]**: o app fecha ao ativar o pack (sob investigação).
-- **`probes/`** — 4 sondas (sky / post / material / weather) para isolar qual estágio provoca o **[E2]**; instruções em `probes/README.md`.
+Downloads diretos (`.hshader`) ficam nas **[Releases](https://github.com/jorginho11111/hshaders-test/releases)**;
+o código-fonte fica no repositório (como no port do Horizon Android).
+
+| Release | Erro registrado |
+| --- | --- |
+| [mellow-v0.1.0](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.0) | **[E1]** `unknown field 'vertex'` na importação |
+| [mellow-v0.1.1](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.1) | **[E1]** corrigido · **[E2]** app fecha ao ativar o pack |
+| [mellow-v0.1.2](https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.2) | **[E2]** sob teste — workaround: `[material]`/`[reflection]` desativados (suspeito nº 1); NaN do AgX corrigido. Assets: pack + 4 sondas de bissecção |
+
+- **`probes/`** — sondas (sky / post / material / weather) que isolam o estágio do **[E2]**; instruções em `probes/README.md`.
 - Relatório de crash do app: `last-rust-panic.txt` (botão *Game files* do launcher → Reports).
+- Os `.hshader` são construídos por `tools/build_hshader.py` e anexados às releases pelo
+  workflow `.github/workflows/release-assets.yml` (o upload direto não funciona no sandbox).
 
 ## How a conversion goes
 

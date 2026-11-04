@@ -1,0 +1,99 @@
+schema = 1
+id = "probe-material"
+name = "Probe Material"
+version = "0.0.1"
+api = ">=0.3.0"
+description = "Crash-bisect probe for Horizon Android 0.7.7 (only the material stage of the Mellow pack)."
+authors = ["TheCMK (original Mellow Shaders)", "conversion: jorginho11111"]
+license = "MIT"
+shared = ["shared.wgsl"]
+
+[[options]]
+id = "light_falloff"
+name = "Light falloff"
+description = "The lightmap's falloff curve (LM_FALLOFF_CURVE): steeper means deeper shade under cover."
+type = "float"
+default = 1.6
+min = 1.0
+max = 2.0
+step = 0.1
+
+[[options]]
+id = "min_light"
+name = "Minimum light"
+description = "How bright the darkest places stay (MIN_LIGHT_AMOUNT)."
+type = "float"
+default = 0.15
+min = 0.0
+max = 0.4
+step = 0.01
+
+[[options]]
+id = "light_red"
+name = "Light colour: red"
+description = "Shifts the colour of the light itself (LM_RED)."
+type = "float"
+default = 0.0
+min = -1.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "light_green"
+name = "Light colour: green"
+description = "Shifts the colour of the light itself (LM_GREEN)."
+type = "float"
+default = 0.0
+min = -1.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "light_blue"
+name = "Light colour: blue"
+description = "Shifts the colour of the light itself (LM_BLUE)."
+type = "float"
+default = 0.0
+min = -1.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "reflections"
+name = "Water reflections"
+description = "The world mirrors on the top of water."
+type = "bool"
+default = true
+
+[[options]]
+id = "reflection_strength"
+name = "Reflection strength"
+description = "How much of the mirror shows on water."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "atmospheric_fog"
+name = "Atmospheric fog"
+description = "Mellow's soft ambient haze that closes in with distance (ATM_FOG_STRENGTH)."
+type = "float"
+default = 0.25
+min = 0.0
+max = 0.5
+step = 0.01
+
+# --- Weather ---
+
+[material]
+file = "material.wgsl"
+name = "Mellow Material"
+fog = false
+
+[reflection]
+option = "reflections"
+
+[budget]
+gpu_ms = 0.5

@@ -1,0 +1,129 @@
+schema = 1
+id = "probe-post"
+name = "Probe Post"
+version = "0.0.1"
+api = ">=0.3.0"
+description = "Crash-bisect probe for Horizon Android 0.7.7 (only the post stages of the Mellow pack)."
+authors = ["TheCMK (original Mellow Shaders)", "conversion: jorginho11111"]
+license = "MIT"
+shared = ["shared.wgsl"]
+
+[[options]]
+id = "bloom_strength"
+name = "Bloom strength"
+description = "The soft halo around bright things (BLOOM_STRENGTH)."
+type = "float"
+default = 0.4
+min = 0.0
+max = 0.8
+step = 0.02
+
+[[options]]
+id = "bloom_curve"
+name = "Bloom curve"
+description = "Where bloom starts to pick up brightness (BLOOM_CURVE)."
+type = "float"
+default = 0.5
+min = 0.1
+max = 1.0
+step = 0.05
+
+# --- Tone map and colour grade (Mellow's final pass) ---
+
+[[options]]
+id = "tonemap"
+name = "Tone mapping"
+description = "Uchimura is Mellow's default operator; AgX Punchy and the fitted ACES curve are two of its others."
+type = "choice"
+values = ["Uchimura", "AgX Punchy", "ACES", "None"]
+default = "Uchimura"
+
+[[options]]
+id = "exposure"
+name = "Exposure"
+description = "Brightness before tone mapping."
+type = "float"
+default = 1.1
+min = 0.5
+max = 2.0
+step = 0.05
+
+[[options]]
+id = "vibrance"
+name = "Vibrance"
+description = "Lifts quiet colours without overdoing strong ones (VIBRANCE)."
+type = "float"
+default = 1.2
+min = 0.0
+max = 2.0
+step = 0.02
+
+[[options]]
+id = "saturation"
+name = "Saturation"
+description = "How colourful the picture is (SATURATION)."
+type = "float"
+default = 1.0
+min = 0.0
+max = 2.0
+step = 0.02
+
+[[options]]
+id = "contrast"
+name = "Contrast"
+description = "Punches the picture up or softens it (CONTRAST)."
+type = "float"
+default = 1.0
+min = 0.5
+max = 1.5
+step = 0.01
+
+[[options]]
+id = "vignette_opacity"
+name = "Vignette"
+description = "Darkens the corners of the picture (VIGNETTE_OPACITY, 0 turns it off)."
+type = "float"
+default = 0.0
+min = 0.0
+max = 2.0
+step = 0.25
+
+[[options]]
+id = "vignette_falloff"
+name = "Vignette falloff"
+description = "How far the vignette reaches in (VIGNETTE_FALLOFF)."
+type = "float"
+default = 0.75
+min = 0.0
+max = 1.5
+step = 0.25
+
+[[options]]
+id = "film_grain"
+name = "Film grain"
+description = "A whisper of grain over the picture (FILM_GRAIN, off by default like Mellow)."
+type = "bool"
+default = false
+
+[[options]]
+id = "film_grain_strength"
+name = "Film grain strength"
+description = "How loud the grain is (FILM_GRAIN_STRENGTH)."
+type = "float"
+default = 0.05
+min = 0.025
+max = 0.2
+step = 0.025
+
+[[post]]
+files = ["post_glow.wgsl"]
+name = "Mellow Glow"
+scale = 0.25
+mipmaps = true
+
+[[post]]
+files = ["post_grade.wgsl"]
+name = "Mellow Grade"
+
+[budget]
+gpu_ms = 0.6

@@ -13,18 +13,18 @@ This pack targets the API surface of **Horizon Android 0.7.7** (the sky,
 material, weather and post stages; that build has no `[vertex]` stage and no
 `MaterialInput.colored_light`).
 
-## Status — v0.1.2 (erros por versão)
+## Status — v0.1.3 (erros por versão — **[E2] com causa raiz encontrada**)
 
 | Versão | Erro no Horizon Android 0.7.7 |
 | --- | --- |
 | 0.1.0 | **[E1]** Import falhava: `unknown field 'vertex'` (TOML). |
 | 0.1.1 | **[E1]** corrigido · **[E2]** o app **fecha ao ativar** o pack. |
-| 0.1.2 | **[E2]** sob teste: workaround aplicado — o estágio `[material]` (+`[reflection]`) ficou **desativado** (é o principal suspeito: packs com material disparam um recarregamento de texturas LabPBR que packs sem material nunca fazem). `material.wgsl` continua no repositório para reativar depois. NaN no AgX Punchy corrigido (`pow`/`log2` de negativo). |
+| 0.1.2 | **[E2]** persistia (workaround `[material]` insuficiente). |
+| 0.1.3 | **[E2] resolvido por workaround** — causa raiz: os **layouts de textura do app** passam do limite de **16 texturas por estágio** das GPUs móveis. O de materiais (19) é recusado com mensagem; o do céu **pânica no wgpu sem captura** (fecha o app — também com o exemplo oficial Golden Hour neste dispositivo). Por isso o `[material]` (desde 0.1.2) **e o `[sky]`** (desde 0.1.3) ficam desativados: o pack roda com **clima + bloom + tone map/grade** (12 opções). Arquivos ficam no repositório, prontos para reativar quando o app corrigir os layouts (issue reportada). |
 
-Enquanto o **[E2]** não fecha: as sondas de bissecção (`probe-sky`, `probe-post`,
-`probe-material`, `probe-weather` — download direto na release) isolam qual
-estágio derruba o app, e o relatório `last-rust-panic.txt` (botão *Game files*
-do launcher → Reports) aponta a linha exata do panic.
+Bissecção (sondas da release): `probe-weather` **funciona** · `probe-material` recusado
+(`limit is 16, count was 19`) · `probe-sky` e `probe-golden` **fecham o app** ·
+`probe-post` tinha um campo TOML meu inválido (`mipmaps`) — corrigido.
 
 ## Using it
 

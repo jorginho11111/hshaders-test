@@ -1,6 +1,10 @@
 // Mellow's painterly sky: a warm halo around a low sun, soft clouds of its own,
 // shader stars, an aurora at night, and Mellow's rainy sky (desaturated, darker).
 // The sun, moon and clouds of vanilla are replaced where the manifest asks for it.
+//
+// *** DESATIVADO na v0.1.3 (workaround do erro [E2]): o layout de texturas do
+// *** pipeline de céu do app passa do limite de 16 por estágio em GPUs móveis e
+// *** o wgpu panic sem captura (fecha o app). O arquivo fica no repositório.
 
 override sky_warmth: f32 = 0.5;
 override rain_sky_desaturation: f32 = 0.5;

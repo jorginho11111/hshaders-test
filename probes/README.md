@@ -13,17 +13,21 @@ o app. Cada uma é o código real do Mellow (mesmos `.wgsl`) com **um único est
 > o `api` do manifesto precisa ser literalmente `"0.1"` e o `id` só pode usar
 > `[a-z0-9_]` (sem hífen). Corrigido — as sondas abaixo importam normalmente.
 
-## Como testar (na ordem)
+## Resultados (bissecção concluída em 2026-11-04)
 
-Instale cada `.hshader` pelo botão **Import file** do launcher, ative-o no **jogo** e observe:
+| # | Sonda | Contém | Resultado no Horizon Android 0.7.7 |
+|---|---|---|---|
+| 1 | `probe-golden.hshader` | o **exemplo oficial Golden Hour** do próprio app | **FECHA O APP** ← o bug é do app/dispositivo, não do Mellow |
+| 2 | `probe-sky.hshader` | só `[sky]` | **FECHA O APP** → o estágio de céu é o gatilho |
+| 3 | `probe-post.hshader` | só os 2 `[[post]]` (glow → grade) | import recusado na 1ª leva (`mipmaps` não existe nesta API) — **corrigido**, falta testar |
+| 4 | `probe-material.hshader` | só `[material]` + `[reflection]` | importa, mas é **recusado** no chat: `Too many bindings of type SampledTextures... limit is 16, count was 19` |
+| 5 | `probe-weather.hshader` | só `[weather]` | **FUNCIONA PERFEITAMENTE** ✓ |
 
-| # | Sonda | Contém | Se FECHAR o app | Conclusão |
-|---|---|---|---|---|
-| 1 | `probe-golden.hshader` | o **exemplo oficial Golden Hour** do próprio app (byte a byte o fixture de testes dele) | o problema é do app/dispositivo com packs `.hshader` — não do Mellow | |
-| 2 | `probe-sky.hshader` | só `[sky]` (nuvens/estrelas desativadas) | o problema está no estágio de céu (ou nas flags `clouds/stars = false`) | |
-| 3 | `probe-post.hshader` | só os 2 `[[post]]` (glow → grade) | o problema está na cadeia de pós-processamento | |
-| 4 | `probe-material.hshader` | só `[material]` + `[reflection]` | o problema está no estágio de materiais (ou no espelho/reflexão) | |
-| 5 | `probe-weather.hshader` | só `[weather]` | o problema está no estágio de clima | |
+**Causa raiz:** os layouts de grupo do app pedem mais texturas por estágio do que GPUs
+móveis permitem (`max_sampled_textures_per_shader_stage = 16`). O de materiais quer 19
+(recusado com aviso); o do céu passa do limite e o erro do wgpu **não é capturado** →
+panic → o app fecha. Enquanto o app não corrigir, o Mellow roda sem `[sky]`/`[material]`
+(clima + pós) — release **0.1.3**.
 
 - Se **todas** rodarem bem → o problema é a **combinação** de estágios (aí testa-se a soma aos poucos).
 - Se **todas** fecharem → o problema é do app no caminho comum (frame/opções), não do pack.

@@ -116,12 +116,11 @@ max = 0.2
 step = 0.025
 
 [[post]]
-files = ["post_glow.wgsl"]
+file = "post_glow.wgsl"
 name = "Mellow Glow"
-scale = 0.25
 
 [[post]]
-files = ["post_grade.wgsl"]
+file = "post_grade.wgsl"
 name = "Mellow Grade"
 
 [budget]

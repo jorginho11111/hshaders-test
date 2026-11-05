@@ -19,7 +19,7 @@ o app. Cada uma é o código real do Mellow (mesmos `.wgsl`) com **um único est
 |---|---|---|---|
 | 1 | `probe-golden.hshader` | o **exemplo oficial Golden Hour** do próprio app | **FECHA O APP** ← o bug é do app/dispositivo, não do Mellow |
 | 2 | `probe-sky.hshader` | só `[sky]` | **FECHA O APP** → o estágio de céu é o gatilho |
-| 3 | `probe-post.hshader` | só os 2 `[[post]]` (glow → grade) | import recusado na 1ª leva (`mipmaps` não existe nesta API) — **corrigido**, falta testar |
+| 3 | `probe-post.hshader` | só os 2 `[[post]]` (glow → grade) | **2 bugs meus no manifesto** impediam o import (`mipmaps` inexistente; `file` obrigatório, não `files`; passe com `scale` exige `output`) — **corrigido**, falta testar |
 | 4 | `probe-material.hshader` | só `[material]` + `[reflection]` | importa, mas é **recusado** no chat: `Too many bindings of type SampledTextures... limit is 16, count was 19` |
 | 5 | `probe-weather.hshader` | só `[weather]` | **FUNCIONA PERFEITAMENTE** ✓ |
 

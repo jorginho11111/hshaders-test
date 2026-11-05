@@ -1,8 +1,8 @@
 schema = 1
-id = "probe-sky"
+id = "probe_sky"
 name = "Probe Sky"
 version = "0.0.1"
-api = ">=0.3.0"
+api = "0.1"
 description = "Crash-bisect probe for Horizon Android 0.7.7 (only the sky stage of the Mellow pack)."
 authors = ["TheCMK (original Mellow Shaders)", "conversion: jorginho11111"]
 license = "MIT"

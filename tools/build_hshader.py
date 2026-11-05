@@ -28,6 +28,16 @@ def zip_dir(out_path, base_dir, names):
           f"{os.path.getsize(out_path)} B, sha256 {h}")
 
 
+def all_files(base_dir):
+    """Every file under base_dir, as sorted '/'-separated relative names."""
+    out = []
+    for root, _dirs, files in os.walk(base_dir):
+        for f in files:
+            rel = os.path.relpath(os.path.join(root, f), base_dir)
+            out.append(rel.replace(os.sep, "/"))
+    return sorted(out)
+
+
 def build_mellow():
     src = os.path.join(ROOT, "mellow")
     toml = open(os.path.join(src, "horizon-shaders.toml")).read()
@@ -49,8 +59,7 @@ def build_probes():
         full = os.path.join(probes, d)
         if not os.path.isdir(full) or not d.startswith("probe-"):
             continue
-        names = [n for n in os.listdir(full) if os.path.isfile(os.path.join(full, n))]
-        zip_dir(os.path.join(DIST, f"{d}.hshader"), full, names)
+        zip_dir(os.path.join(DIST, f"{d}.hshader"), full, all_files(full))
 
 
 if __name__ == "__main__":

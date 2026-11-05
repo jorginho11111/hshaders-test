@@ -19,15 +19,18 @@ o app. Cada uma é o código real do Mellow (mesmos `.wgsl`) com **um único est
 |---|---|---|---|
 | 1 | `probe-golden.hshader` | o **exemplo oficial Golden Hour** do próprio app | **FECHA O APP** ← o bug é do app/dispositivo, não do Mellow |
 | 2 | `probe-sky.hshader` | só `[sky]` | **FECHA O APP** → o estágio de céu é o gatilho |
-| 3 | `probe-post.hshader` | só os 2 `[[post]]` (glow → grade) | **2 bugs meus no manifesto** impediam o import (`mipmaps` inexistente; `file` obrigatório, não `files`; passe com `scale` exige `output`) — **corrigido**, falta testar |
+| 3 | `probe-post.hshader` | só os 2 `[[post]]` (glow → grade) | 3 bugs meus no manifesto corrigidos (`mipmaps`; `file` obrigatório; `scale` exige `output`). **Testado (2026-11-05): importa ✓ mas O APP FECHA ao ativar** — a cadeia de passes aloca alvos `Rgba16Float` + histórico no app, que derrubam o GLES móvel |
+| 3b | `probe-post1.hshader` | 1 passe só (`[[post]]` trivial, sem cadeia, sem opções) | **Novo (0.1.4)** — se rodar onde o probe-post fecha, a cadeia é a causa confirmada |
 | 4 | `probe-material.hshader` | só `[material]` + `[reflection]` | importa, mas é **recusado** no chat: `Too many bindings of type SampledTextures... limit is 16, count was 19` |
 | 5 | `probe-weather.hshader` | só `[weather]` | **FUNCIONA PERFEITAMENTE** ✓ |
 
 **Causa raiz:** os layouts de grupo do app pedem mais texturas por estágio do que GPUs
 móveis permitem (`max_sampled_textures_per_shader_stage = 16`). O de materiais quer 19
 (recusado com aviso); o do céu passa do limite e o erro do wgpu **não é capturado** →
-panic → o app fecha. Enquanto o app não corrigir, o Mellow roda sem `[sky]`/`[material]`
-(clima + pós) — release **0.1.3**.
+panic → o app fecha. **Somado a isso (0.1.4):** cadeias de `[[post]]` também fecham o
+app (alvos `Rgba16Float` do próprio app) — o Mellow agora funde tudo em **um passe**
+(`mellow-0.1.4`). A iluminação (`[material]`, que só é recusada) volta no pacote
+**`mellow-full-0.1.4`** para aparelhos/PCs com 19+ slots de textura.
 
 - Se **todas** rodarem bem → o problema é a **combinação** de estágios (aí testa-se a soma aos poucos).
 - Se **todas** fecharem → o problema é do app no caminho comum (frame/opções), não do pack.

@@ -1,7 +1,15 @@
-// Mellow's final pass (program/final.fsh): tone mapping (Uchimura is its
-// default operator), then vignette, vibrance, saturation and contrast in the
-// picture's own space, film grain when asked for, and a quiet dither at the end.
+// Mellow's bloom + final pass in ONE [[post]] pass (glow added, then tone map
+// and grade). Merged on purpose: a chain of two passes makes the app allocate
+// Rgba16Float chain targets and a history texture, which mobile GLES drivers
+// choke on (the app closes); a single pass draws straight to the screen.
+//
+// Bloom (BLOOM, BLOOM_STRENGTH 0.4, BLOOM_CURVE 0.5): a soft halo of the
+// brightest pixels on two rings of taps. The final pass (program/final.fsh):
+// tone mapping (Uchimura default), vignette, vibrance, saturation, contrast,
+// film grain when asked for, and a quiet dither.
 
+override bloom_strength: f32 = 0.4;
+override bloom_curve: f32 = 0.5;
 override tonemap: u32 = 0u;
 override exposure: f32 = 1.1;
 override vibrance: f32 = 1.2;
@@ -12,8 +20,29 @@ override vignette_falloff: f32 = 0.75;
 override film_grain: bool = false;
 override film_grain_strength: f32 = 0.05;
 
+fn bright(uv: vec2<f32>) -> vec3<f32> {
+    let c = textureSampleLevel(previous, linear_sampler, uv, 0.0).rgb;
+    let sky = select(1.0, 0.25, depth_at(uv) == 0.0);
+    return c * smoothstep(bloom_curve, 1.0, get_luminance(c)) * sky;
+}
+
 fn post(input: PostInput) -> vec4<f32> {
-    var c = input.color.rgb * exposure;
+    // The bloom halo, added to the picture.
+    var color = input.color;
+    if (bloom_strength > 0.0) {
+        let step_uv = frame.resolution.y / 720.0 / frame.resolution;
+        var sum = vec3<f32>(0.0);
+        for (var i = 0; i < 12; i++) {
+            let angle = f32(i) * 0.5235988;
+            let radius = select(3.0, 7.0, (i & 1) == 1);
+            let offset = vec2<f32>(cos(angle), sin(angle)) * radius * step_uv;
+            sum = sum + bright(input.uv + offset);
+        }
+        color = vec4<f32>(color.rgb + sum * (bloom_strength / 8.0), color.a);
+    }
+
+    // The grade.
+    var c = color.rgb * exposure;
 
     // Tone map: Uchimura (Mellow's operator 6), AgX Punchy (its operator 7),
     // the fitted ACES curve (its operator 1), or nothing.

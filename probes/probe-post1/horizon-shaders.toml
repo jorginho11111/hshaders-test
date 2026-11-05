@@ -1,0 +1,16 @@
+# probe-post1 — does a SINGLE [[post]] pass keep the app alive?
+#
+# The two-pass chain probe (probe-post) closes the app; the app's chain path
+# allocates Rgba16Float targets + history, which mobile GLES drivers choke on.
+# This probe has ONE pass with no options and no chain: warm tint, straight to
+# screen. If this works where probe-post crashes, the chain is confirmed.
+schema = 1
+id = "probe_post1"
+name = "probe-post1"
+version = "0.0.1"
+api = "0.1"
+description = "One trivial post pass, no chain: the leanest post path."
+
+[[post]]
+file = "post.wgsl"
+name = "Single tint pass"

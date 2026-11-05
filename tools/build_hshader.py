@@ -38,8 +38,8 @@ def all_files(base_dir):
     return sorted(out)
 
 
-def build_mellow():
-    src = os.path.join(ROOT, "mellow")
+def build_pack(folder):
+    src = os.path.join(ROOT, folder)
     toml = open(os.path.join(src, "horizon-shaders.toml")).read()
     version = re.search(r'^version = "([^"]+)"', toml, re.M).group(1)
     wgs = set(re.findall(r'^shared = (.+)$', toml, re.M)[0].replace('"', '').
@@ -49,8 +49,8 @@ def build_mellow():
     names = ["horizon-shaders.toml", "README.md", "LICENSE"] + sorted(wgs)
     missing = [n for n in names if not os.path.isfile(os.path.join(src, n))]
     if missing:
-        sys.exit(f"mellow/: missing {missing}")
-    zip_dir(os.path.join(DIST, f"mellow-{version}.hshader"), src, names)
+        sys.exit(f"{folder}/: missing {missing}")
+    zip_dir(os.path.join(DIST, f"{folder}-{version}.hshader"), src, names)
 
 
 def build_probes():
@@ -64,5 +64,6 @@ def build_probes():
 
 if __name__ == "__main__":
     os.makedirs(DIST, exist_ok=True)
-    build_mellow()
+    for pack in ["mellow", "mellow-full"]:
+        build_pack(pack)
     build_probes()

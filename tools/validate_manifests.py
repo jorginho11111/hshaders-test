@@ -100,6 +100,39 @@ def check(manifest, base):
         if sname == 'post':
             post.append(body)
 
+    # Field names the app's serde structs accept (deny_unknown_fields everywhere).
+    TOP_FIELDS = {
+        "schema", "id", "name", "version", "api", "description", "authors",
+        "license", "shared", "sky", "material", "weather", "post", "options",
+        "pages", "tags", "materials", "textures", "lights", "budget",
+        "reflection", "shadow",
+    }
+    first_sec = re.search(r'^\[\[?[\w]+\]?\]\s*$', text, re.M)
+    head = text[:first_sec.start()] if first_sec else text
+    top_keys = {m.group(1) for m in re.finditer(r'^(\w+) =', head, re.M)}
+    unknown = top_keys - TOP_FIELDS
+    if unknown:
+        errs.append(f'top-level unknown fields {sorted(unknown)}')
+
+    SECTION_KEYS = {
+        "budget": {"gpu_ms"},
+        "reflection": {"option"},
+    }
+    for sname, body in secs:
+        if sname not in SECTION_KEYS:
+            continue
+        keys = {m.group(1) for m in (re.match(r'^(\w+) =', l) for l in body) if m}
+        unknown = keys - SECTION_KEYS[sname]
+        if unknown:
+            errs.append(f'[{sname}] unknown fields {sorted(unknown)} (app takes only {sorted(SECTION_KEYS[sname])})')
+        if sname == 'budget' and 'gpu_ms' in keys:
+            try:
+                ms = float(field(body, 'gpu_ms'))
+                if not (0.0 < ms <= 16.0):
+                    errs.append(f'budget.gpu_ms {ms} must be in (0, 16]')
+            except (TypeError, ValueError):
+                errs.append('budget.gpu_ms must be a number')
+
     # post chain rules (check_post_targets)
     for i, body in enumerate(post):
         scale = float(field(body, 'scale') or 1.0)

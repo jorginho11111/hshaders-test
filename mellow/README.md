@@ -14,7 +14,7 @@ This pack targets the API surface of **Horizon Android 0.7.7** (the sky,
 material, weather and post stages; that build has no `[vertex]` stage and no
 `MaterialInput.colored_light`).
 
-## Status — v0.1.5 (erros por versão)
+## Status — v0.1.7 (erros por versão)
 
 | Versão | Erro no Horizon Android 0.7.7 |
 | --- | --- |
@@ -24,7 +24,8 @@ material, weather and post stages; that build has no `[vertex]` stage and no
 | 0.1.3 | **[E2] resolvido por workaround** — causa raiz: os **layouts de textura do app** passam do limite de **16 texturas por estágio** das GPUs móveis. O de materiais (19) é recusado com mensagem; o do céu **pânica no wgpu sem captura** (fecha o app — também com o exemplo oficial Golden Hour neste dispositivo). Por isso o `[material]` (desde 0.1.2) **e o `[sky]`** (desde 0.1.3) ficam desativados: o pack roda com **clima + bloom + tone map/grade** (12 opções). Arquivos ficam no repositório, prontos para reativar quando o app corrigir os layouts (issue reportada). |
 | 0.1.4 | **[E3] a cadeia de 2 passes do pós fecha o app** — o app aloca alvos `Rgba16Float` + histórico para cadeias, que quebram o GLES móvel (sonda `probe-post` reproduz; `probe-post1` = 1 passe só, para confirmar). **Contornado**: bloom + tone map + grade **fundidos em UM passe** (`post_final.wgsl`). **Iluminação de volta**: `[material]` vai no pacote **`mellow-full`** (aparelhos com 19+ slots de textura por estágio — no seu aparelho o app recusa com aviso, sem fechar). |
 | **0.1.5** | **✅ CAUSA RAIZ DE TODOS OS ERROS: o backend OPENGL ES do app.** Com **Vulkan** nada fecha, nada é recusado — todas as sondas rodam. **Tudo religado**: `[sky]` + `[material]` (luz, reflexos, névoa) + `[weather]` + pós (o passe único otimizado fica). **MAS**: o import falhava com `TOML parse error ... duplicate key [sky]` — bug meu na montagem do manifesto (chaves `[sky]`, `[reflection]` e `[budget]` duplicadas). |
-| **0.1.6** | **✅ Import corrigido** — as chaves duplicadas saíram e o `tools/validate_manifests.py` agora faz **parse TOML estrito** (a mesma rejeição do app), então essa classe de erro não passa mais. **Pack completo no ar**: céu + luz + clima + pós, **29 opções**. |
+| **0.1.6** | As chaves duplicadas saíram (validador ganhou parse TOML estrito) — **MAS** o import ainda falhava: `unknown field 'frames', expected 'gpu_ms'` na linha 332 — meu `[budget]` usava campos inventados (`frames`/`max_ms`/`scales`); o do app é só `gpu_ms = <ms>`. |
+| **0.1.7** | **✅ Import corrigido de vez** — o `[budget]` do app só aceita `gpu_ms` (ms de GPU que o pack mira por frame, pro overlay de orçamento); os campos `frames`/`max_ms`/`scales` eram invenção minha. Agora o validador valida os campos de **todas** as seções contra o schema do app, e cada campo do manifesto foi cruzado com os das sondas (que já importam no aparelho). |
 
 Bissecção (sondas da release): no **OpenGL ES** `probe-weather` funcionava ·
 `probe-material` era recusado (`limit is 16, count was 19`) · `probe-sky`,

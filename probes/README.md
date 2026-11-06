@@ -27,10 +27,10 @@ o app. Cada uma é o código real do Mellow (mesmos `.wgsl`) com **um único est
 **Causa raiz:** os layouts de grupo do app pedem mais texturas por estágio do que GPUs
 móveis permitem (`max_sampled_textures_per_shader_stage = 16`). O de materiais quer 19
 (recusado com aviso); o do céu passa do limite e o erro do wgpu **não é capturado** →
-panic → o app fecha. **Somado a isso (0.1.4):** cadeias de `[[post]]` também fecham o
-app (alvos `Rgba16Float` do próprio app) — o Mellow agora funde tudo em **um passe**
-(`mellow-0.1.4`). A iluminação (`[material]`, que só é recusada) volta no pacote
-**`mellow-full-0.1.4`** para aparelhos/PCs com 19+ slots de textura.
+panic → o app fecha. **RESOLUÇÃO FINAL (2026-11-05):** tudo isso era do **backend
+OpenGL ES** do app — com **Vulkan** todas as sondas rodam, nada fecha e nada é
+recusado. As sondas ficam aqui como registro da bissecção; o Mellow **0.1.5** volta
+com todos os estágios (céu + materiais + clima + pós em 1 passe) e 29 opções.
 
 - Se **todas** rodarem bem → o problema é a **combinação** de estágios (aí testa-se a soma aos poucos).
 - Se **todas** fecharem → o problema é do app no caminho comum (frame/opções), não do pack.

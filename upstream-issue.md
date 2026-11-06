@@ -40,3 +40,23 @@ On devices where `max_sampled_textures_per_shader_stage = 16` (common on mobile 
 ## Extra (pack-side info)
 
 The `mipmaps` key some notes mention is **not** a `[[post]]` field on this API (`unknown field 'mipmaps'`) — the accepted stage fields are `file, files, name, fog, clouds, sun, stars, scale, output` only.
+
+## UPDATE (2026-11-05) — it's the OpenGL ES backend
+
+Switching the renderer from **OpenGL ES** to **Vulkan** makes ALL of the above
+go away on the same device: the material stage runs (reflections included), the
+sky stage runs, and the official golden_hour fixture runs. Nothing is refused
+and nothing closes. So the 16-texture refusals and the uncaptured sky panic are
+problems of the **GLES backend's** device limits / error handling.
+
+One more GLES-only crash found in the same bisection: a pack with a **chain of
+2+ `[[post]]` passes** also closes the app (chain passes allocate
+`Rgba16Float` targets + a history texture in `NativePost::prepare`). A single
+post pass draws straight to the screen and survives. Repro probes are in the
+`Assets` of https://github.com/jorginho11111/hshaders-test/releases/tag/mellow-v0.1.3
+(`probe-*.hshader`), results in that repo's `probes/README.md`.
+
+Still worth fixing regardless of backend: the sky path's uncaptured
+`create_pipeline_layout` (a panic instead of a refused pack is bad UX on any
+backend), and the layouts being huge for mobile GLES users, who will keep
+hitting this until the app grows its limits or slims the layouts.

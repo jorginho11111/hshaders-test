@@ -6,14 +6,15 @@ the **Horizon shader API** (WGSL, `horizon-shaders.toml` schema 1).
 
 Mellow's look comes from its colour grading, soft bloom, shaped lightmap and
 sky work. Those became Horizon stages: a painterly `[sky]`, a `[material]` that
-shapes the light, a soft `[weather]`, and two `[[post]]` passes (bloom, then
-tone map and grade).
+shapes the light (with water reflections and atmospheric fog), a soft
+`[weather]`, and one `[[post]]` pass (bloom + tone map + grade, merged for
+speed). All stages are active since v0.1.5.
 
 This pack targets the API surface of **Horizon Android 0.7.7** (the sky,
 material, weather and post stages; that build has no `[vertex]` stage and no
 `MaterialInput.colored_light`).
 
-## Status — v0.1.4 (erros por versão)
+## Status — v0.1.5 (erros por versão)
 
 | Versão | Erro no Horizon Android 0.7.7 |
 | --- | --- |
@@ -22,10 +23,12 @@ material, weather and post stages; that build has no `[vertex]` stage and no
 | 0.1.2 | **[E2]** persistia (workaround `[material]` insuficiente). |
 | 0.1.3 | **[E2] resolvido por workaround** — causa raiz: os **layouts de textura do app** passam do limite de **16 texturas por estágio** das GPUs móveis. O de materiais (19) é recusado com mensagem; o do céu **pânica no wgpu sem captura** (fecha o app — também com o exemplo oficial Golden Hour neste dispositivo). Por isso o `[material]` (desde 0.1.2) **e o `[sky]`** (desde 0.1.3) ficam desativados: o pack roda com **clima + bloom + tone map/grade** (12 opções). Arquivos ficam no repositório, prontos para reativar quando o app corrigir os layouts (issue reportada). |
 | 0.1.4 | **[E3] a cadeia de 2 passes do pós fecha o app** — o app aloca alvos `Rgba16Float` + histórico para cadeias, que quebram o GLES móvel (sonda `probe-post` reproduz; `probe-post1` = 1 passe só, para confirmar). **Contornado**: bloom + tone map + grade **fundidos em UM passe** (`post_final.wgsl`). **Iluminação de volta**: `[material]` vai no pacote **`mellow-full`** (aparelhos com 19+ slots de textura por estágio — no seu aparelho o app recusa com aviso, sem fechar). |
+| **0.1.5** | **✅ CAUSA RAIZ DE TODOS OS ERROS: o backend OPENGL ES do app.** Com **Vulkan** nada fecha, nada é recusado — todas as sondas rodam. **Tudo religado**: `[sky]` + `[material]` (luz, reflexos, névoa) + `[weather]` + pós (o passe único otimizado fica). **29 opções** de customização. |
 
-Bissecção (sondas da release): `probe-weather` **funciona** · `probe-material` recusado
-(`limit is 16, count was 19`) · `probe-sky` e `probe-golden` **fecham o app** ·
-`probe-post` tinha um campo TOML meu inválido (`mipmaps`) — corrigido.
+Bissecção (sondas da release): no **OpenGL ES** `probe-weather` funcionava ·
+`probe-material` era recusado (`limit is 16, count was 19`) · `probe-sky`,
+`probe-golden` e `probe-post` fechavam o app. No **Vulkan** todas funcionam —
+eram limites e panics do backend GLES do app, não do pacote.
 
 ## Using it
 

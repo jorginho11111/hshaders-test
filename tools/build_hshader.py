@@ -64,6 +64,5 @@ def build_probes():
 
 if __name__ == "__main__":
     os.makedirs(DIST, exist_ok=True)
-    for pack in ["mellow", "mellow-full"]:
-        build_pack(pack)
+    build_pack("mellow")
     build_probes()

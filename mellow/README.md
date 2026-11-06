@@ -14,7 +14,7 @@ This pack targets the API surface of **Horizon Android 0.7.7** (the sky,
 material, weather and post stages; that build has no `[vertex]` stage and no
 `MaterialInput.colored_light`).
 
-## Status — v0.1.7 (erros por versão)
+## Status — v0.1.8 (erros por versão)
 
 | Versão | Erro no Horizon Android 0.7.7 |
 | --- | --- |
@@ -26,6 +26,7 @@ material, weather and post stages; that build has no `[vertex]` stage and no
 | **0.1.5** | **✅ CAUSA RAIZ DE TODOS OS ERROS: o backend OPENGL ES do app.** Com **Vulkan** nada fecha, nada é recusado — todas as sondas rodam. **Tudo religado**: `[sky]` + `[material]` (luz, reflexos, névoa) + `[weather]` + pós (o passe único otimizado fica). **MAS**: o import falhava com `TOML parse error ... duplicate key [sky]` — bug meu na montagem do manifesto (chaves `[sky]`, `[reflection]` e `[budget]` duplicadas). |
 | **0.1.6** | As chaves duplicadas saíram (validador ganhou parse TOML estrito) — **MAS** o import ainda falhava: `unknown field 'frames', expected 'gpu_ms'` na linha 332 — meu `[budget]` usava campos inventados (`frames`/`max_ms`/`scales`); o do app é só `gpu_ms = <ms>`. |
 | **0.1.7** | **✅ Import corrigido de vez** — o `[budget]` do app só aceita `gpu_ms` (ms de GPU que o pack mira por frame, pro overlay de orçamento); os campos `frames`/`max_ms`/`scales` eram invenção minha. Agora o validador valida os campos de **todas** as seções contra o schema do app, e cada campo do manifesto foi cruzado com os das sondas (que já importam no aparelho). |
+| **0.1.8** | Luz **quente** (padrões `light_red/green/blue` trocados do neutro 0.0 para um tom de tocha suave), configurações divididas em **abas/tópicos via `[[pages]]`** (luz/material, névoa/fog, reflexos na água, céu, clima, bloom, grade final — as 29 opções, a primeira aba alcança todas as outras), e **exatamente dois presets**: `batata` (efeitos pesados desligados, para configurar sem lag) e `editável` (os valores do Mellow normal do usuário: `light_falloff=1.8`, `star_strength=1.75`, `atmospheric_fog=0`, `bloom_strength=0`, `reflections=false`, `[shadow] distance=64.0`). Chaves do preset do usuário que esta API ainda não expõe (border fog, dynamic shadows, handheld lights, motion blur, outline, puddles, rainbows, underwater fog, water normals, …) são listadas como não-suportadas abaixo. |
 
 Bissecção (sondas da release): no **OpenGL ES** `probe-weather` funcionava ·
 `probe-material` era recusado (`limit is 16, count was 19`) · `probe-sky`,
@@ -34,12 +35,17 @@ eram limites e panics do backend GLES do app, não do pacote.
 
 ## Using it
 
-Put this folder in `shaderpacks/` beside `options.txt`, or download
-`mellow-<version>.hshader` from the release's **Assets** (download direto) and
-import it from the launcher's Shaders page, then pick **Mellow** on
-Options > Horizon Settings > Shader Packs. Every knob of the original that maps
-to this API is on the pack's options page, named after the `#define` it came
-from.
+Put this folder in `shaderpacks/` beside `options.txt`, or download the
+`.hshader` assets from the release's **Assets** (download direto) and import
+one from the launcher's Shaders page, then pick **Mellow** on
+Options > Horizon Settings > Shader Packs:
+
+- `mellow-0.1.8.hshader` — plain pack, warm-light defaults.
+- `mellow-batata-0.1.8.hshader` — batata preset (heavy effects off, lag-free).
+- `mellow-editavel-0.1.8.hshader` — editável preset (the user's normal-Mellow values).
+
+Every knob of the original that maps to this API is on the pack's options
+page, named after the `#define` it came from.
 
 ## What was converted
 
@@ -80,6 +86,43 @@ from.
   `frame.dimension` covers the basics only.
 - **`EXPOSURE 1.7`** — that value belongs to Mellow's internal linear pipeline;
   the `exposure` option here starts at 1.1, which suits this one.
+
+## Settings tabs and presets
+
+The settings are split into **tabs/topics**, like the original Mellow's
+`screens=…` line (light/material, fog, sky, water, post …). They come from
+`[[pages]]` in the manifest; the first page (`luz`) links to every other page,
+so every one of the 29 options is reachable from it:
+
+| Page (tab) | Options |
+| --- | --- |
+| `luz` — Luz / material | `light_falloff`, `min_light`, `light_red`, `light_green`, `light_blue` |
+| `nevoa` — Névoa / fog | `atmospheric_fog` |
+| `reflexos` — Reflexos na água | `reflections`, `reflection_strength` |
+| `ceu` — Céu | `sky_warmth`, `rain_sky_desaturation`, `rain_sky_darkening`, `cloud_opacity`, `cloud_amount`, `cloud_speed`, `aurora`, `aurora_strength`, `star_strength` |
+| `clima` — Clima | `weather_opacity` |
+| `bloom` — Bloom | `bloom_strength`, `bloom_curve` |
+| `grade` — Grade final | `tonemap`, `exposure`, `vibrance`, `saturation`, `contrast`, `vignette_opacity`, `vignette_falloff`, `film_grain`, `film_grain_strength` |
+
+**Exactly two presets** ship as separate `.hshader` assets on the release:
+
+- **`mellow-batata-0.1.8.hshader`** — "só pra poder configurar sem lag": every
+  heavy effect off (`reflections=false`, `atmospheric_fog=0`, `aurora=false`,
+  `bloom_strength=0`, `vignette_opacity=0`, `film_grain=false`, `cloud_opacity=0`,
+  `star_strength=0.1`), so you can tweak the rest without lag.
+- **`mellow-editavel-0.1.8.hshader`** — "deixa assim": the user's own
+  normal-Mellow values as defaults — `light_falloff=1.8`,
+  `star_strength=1.75`, `atmospheric_fog=0`, `bloom_strength=0`,
+  `reflections=false`, plus `[shadow] distance=64.0`. The plain
+  `mellow-0.1.8.hshader` keeps the warm-light defaults.
+
+Preset keys the user asked for that this Horizon build does **not** expose yet
+(documented, not silently dropped): border fog (`BORDER_FOG`/`BORDER_FOG_STRENGTH`),
+dynamic shadows (`DYNAMIC_SHADOWS`), handheld lights (`HANDHELD_LIGHTS`),
+motion blur (`MOTION_BLUR`/`MOTION_BLUR_STRENGTH`), outlines
+(`OUTLINE_BRIGHTNESS`/`OUTLINE_THICKNESS`), puddles (`PUDDLE_COVERAGE`),
+rainbows (`RAINBOWS`/`RAINBOW_STRENGTH`), underwater fog (`UNDERWATER_FOG_STRENGTH`),
+water normals (`WATER_NORMALS`), end fog (`END_FOG`).
 
 ## Rules this pack follows
 

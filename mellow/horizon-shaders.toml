@@ -10,10 +10,14 @@
 # v0.1.7: fixes v0.1.6's import failure ([budget] used invented fields; the
 # app's [budget] only takes gpu_ms — the GPU milliseconds the pack aims to
 # add to a frame, shown by the over-budget overlay).
+# v0.1.8: warm light defaults (light_red/green/blue), settings split into
+# tabs/topics via [[pages]] (luz / névoa / reflexos / céu / clima / bloom / grade),
+# and exactly two presets: batata (heavy effects off, lag-free) and editavel
+# (the user's own normal-Mellow values).
 schema = 1
 id = "mellow"
 name = "Mellow"
-version = "0.1.7"
+version = "0.1.8"
 api = "0.1"
 description = "A painterly, gameplay-first conversion of Mellow Shaders: shaped light, vivid colour grading, soft bloom, sky, water reflections and weather."
 authors = ["TheCMK (original Mellow shaderpack)", "Horizon WGSL conversion"]
@@ -155,7 +159,7 @@ id = "light_red"
 name = "Warm light red"
 description = "Boosts the red channel of block light (0 is neutral; torch light ~0.6)."
 type = "float"
-default = 0.0
+default = 0.15
 min = 0.0
 max = 1.0
 step = 0.05
@@ -165,7 +169,7 @@ id = "light_green"
 name = "Warm light green"
 description = "Boosts the green channel of block light (0 is neutral)."
 type = "float"
-default = 0.0
+default = 0.08
 min = 0.0
 max = 1.0
 step = 0.05
@@ -333,3 +337,56 @@ option = "reflections"
 
 [budget]
 gpu_ms = 2.0
+
+# --- Settings pages (tabs/topics, like the original Mellow's screens) ---
+# The first page is the entry point: every other page and every option is
+# reached by following its `items` links from there.
+
+[[pages]]
+id = "luz"
+name = "Luz / material"
+description = "Como a luz cai nos blocos: queda, brilho mínimo, cor da luz."
+columns = 2
+items = ["light_falloff", "min_light", "light_red", "light_green", "light_blue"]
+
+[[pages]]
+id = "nevoa"
+name = "Névoa / fog"
+description = "Névoa atmosférica à distância."
+columns = 2
+items = ["atmospheric_fog"]
+
+[[pages]]
+id = "reflexos"
+name = "Reflexos na água"
+description = "O mundo espelhado na superfície da água."
+columns = 2
+items = ["reflections", "reflection_strength"]
+
+[[pages]]
+id = "ceu"
+name = "Céu"
+description = "Céu, nuvens, aurora e estrelas de Mellow."
+columns = 2
+items = ["sky_warmth", "rain_sky_desaturation", "rain_sky_darkening", "cloud_opacity", "cloud_amount", "cloud_speed", "aurora", "aurora_strength", "star_strength"]
+
+[[pages]]
+id = "clima"
+name = "Clima"
+description = "Chuva e neve."
+columns = 2
+items = ["weather_opacity"]
+
+[[pages]]
+id = "bloom"
+name = "Bloom"
+description = "O brilho suave ao redor de coisas brilhantes."
+columns = 2
+items = ["bloom_strength", "bloom_curve"]
+
+[[pages]]
+id = "grade"
+name = "Grade final"
+description = "Tom map, exposição, vibração, saturação, contraste, vinheta e grão."
+columns = 2
+items = ["tonemap", "exposure", "vibrance", "saturation", "contrast", "vignette_opacity", "vignette_falloff", "film_grain", "film_grain_strength"]

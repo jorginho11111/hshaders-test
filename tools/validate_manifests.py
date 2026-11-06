@@ -203,7 +203,7 @@ def check(manifest, base):
 
 
 if __name__ == "__main__":
-    ok = check("mellow/horizon-shaders.toml", "mellow")
+    ok = check("water_walk/horizon-shaders.toml", "water_walk")
     for d in sorted(glob.glob("probes/probe-*/")):
         ok &= check(os.path.join(d, "horizon-shaders.toml"), d.rstrip("/"))
     sys.exit(0 if ok else 1)

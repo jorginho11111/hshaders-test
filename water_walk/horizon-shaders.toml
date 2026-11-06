@@ -1,4 +1,4 @@
-# Mellow for Horizon — a conversion of Mellow Shaders (Iris/OptiFine, GLSL)
+# Water Walk for Horizon — a conversion of Mellow Shaders (Iris/OptiFine, GLSL)
 # to the Horizon shader API (WGSL), schema 1.
 # Original: "Mellow" by TheCMK, https://codeberg.org/TheCMK/mellow-shader (MIT).
 #
@@ -10,13 +10,12 @@
 # v0.1.7: fixes v0.1.6's import failure ([budget] used invented fields; the
 # app's [budget] only takes gpu_ms — the GPU milliseconds the pack aims to
 # add to a frame, shown by the over-budget overlay).
-# v0.1.8: warm light defaults (light_red/green/blue), settings split into
-# tabs/topics via [[pages]] (luz / névoa / reflexos / céu / clima / bloom / grade),
-# and exactly two presets: batata (heavy effects off, lag-free) and editavel
-# (the user's own normal-Mellow values).
+# v0.1.8: warm light defaults (light_red/green/blue), exactly two presets:
+# batata (heavy effects off, lag-free) and editavel (the user's own normal-Mellow values).
+# Pack renamed to Water Walk.
 schema = 1
-id = "mellow"
-name = "Mellow"
+id = "water_walk"
+name = "Water Walk"
 version = "0.1.8"
 api = "0.1"
 description = "A painterly, gameplay-first conversion of Mellow Shaders: shaped light, vivid colour grading, soft bloom, sky, water reflections and weather."

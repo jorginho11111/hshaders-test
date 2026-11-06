@@ -214,12 +214,23 @@ def check_pages(data, opt_ids, errs, name):
     if not pages:
         return
     opt_id_set = set(opt_ids)
+    page_id_set = set(page_ids)
     page_items = {}          # page id -> set of option ids on it
+    page_links = {}          # page id -> set of linked page ids
     for page in pages:
         pid = page.get("id")
         items = page.get("items") or []
         seen_on_page = set()
+        links = set()
         for item in items:
+            link = item[1:-1] if item.startswith("[") and item.endswith("]") else None
+            if link is not None:
+                # link to another page (Mellow uses [SCREEN] references)
+                if link not in page_id_set:
+                    errs.append(f'[[pages]] {pid}: unknown page link [{link!r}]')
+                else:
+                    links.add(link)
+                continue
             if item not in opt_id_set:
                 errs.append(f'[[pages]] {pid}: unknown item {item!r} (not an option id)')
                 continue
@@ -227,6 +238,7 @@ def check_pages(data, opt_ids, errs, name):
                 errs.append(f'[[pages]] {pid}: option {item!r} listed twice on the same page')
             seen_on_page.add(item)
         page_items[pid] = seen_on_page
+        page_links[pid] = links
     # every option must appear on exactly one page
     all_on_pages = set()
     for pid, items in page_items.items():
@@ -237,6 +249,20 @@ def check_pages(data, opt_ids, errs, name):
     missing = opt_id_set - all_on_pages
     if missing:
         errs.append(f'[[pages]] options not listed on any page: {sorted(missing)}')
+    # reachability: walk from the first page, following page links.
+    reached_pages = set()
+    stack = [pages[0].get("id")]
+    while stack:
+        pid = stack.pop()
+        if pid in reached_pages:
+            continue
+        reached_pages.add(pid)
+        for link in page_links.get(pid, set()):
+            if link not in reached_pages:
+                stack.append(link)
+    unreached_pages = page_id_set - reached_pages
+    if unreached_pages:
+        errs.append(f'[[pages]] pages not reached from the first page: {sorted(unreached_pages)}')
 
 
 if __name__ == "__main__":

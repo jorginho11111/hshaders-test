@@ -117,6 +117,7 @@ def check(manifest, base):
     SECTION_KEYS = {
         "budget": {"gpu_ms"},
         "reflection": {"option"},
+        "shadow": {"resolution", "distance", "solid_materials"},
     }
     for sname, body in secs:
         if sname not in SECTION_KEYS:
@@ -185,6 +186,10 @@ def check(manifest, base):
     if len(opt_ids) != len(set(opt_ids)):
         errs.append('duplicate option ids')
 
+    # [[pages]] (tabs/topics): known ids, each page id once, items are option or
+    # page ids only, and every page + option is reached from the first page.
+    check_pages(data, opt_ids, errs, name)
+
     used = set()
     for f in files:
         if not f.endswith(('shared.wgsl', 'common.wgsl')):
@@ -198,8 +203,45 @@ def check(manifest, base):
     return not errs
 
 
+
+def check_pages(data, opt_ids, errs, name):
+    pages = data.get("pages") or []
+    page_ids = [p.get("id") for p in pages]
+    if len(page_ids) != len(set(page_ids)):
+        dups = sorted(i for i in page_ids if page_ids.count(i) > 1)
+        errs.append(f'[[pages]] duplicate page ids: {dups}')
+        return
+    if not pages:
+        return
+    page_id_set = set(page_ids)
+    opt_id_set = set(opt_ids)
+    reached_pages = set()
+    reached_opts = set()
+    stack = [pages[0].get("id")]
+    while stack:
+        pid = stack.pop()
+        if pid in reached_pages:
+            continue
+        reached_pages.add(pid)
+        page = next(p for p in pages if p.get("id") == pid)
+        for item in page.get("items") or []:
+            if item in page_id_set and item not in reached_pages:
+                stack.append(item)
+            elif item in opt_id_set:
+                reached_opts.add(item)
+            else:
+                errs.append(f'[[pages]] {pid}: unknown item {item!r} (not an option or page id)')
+    unreached_pages = page_id_set - reached_pages
+    if unreached_pages:
+        errs.append(f'[[pages]] pages not reached from the first page: {sorted(unreached_pages)}')
+    unreached_opts = opt_id_set - reached_opts
+    if unreached_opts:
+        errs.append(f'[[pages]] options not listed on any page: {sorted(unreached_opts)}')
+
+
 if __name__ == "__main__":
     ok = check("mellow/horizon-shaders.toml", "mellow")
     for d in sorted(glob.glob("probes/probe-*/")):
         ok &= check(os.path.join(d, "horizon-shaders.toml"), d.rstrip("/"))
     sys.exit(0 if ok else 1)
+

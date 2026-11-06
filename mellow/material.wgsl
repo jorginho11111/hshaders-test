@@ -9,8 +9,8 @@
 
 override light_falloff: f32 = 1.6;
 override min_light: f32 = 0.15;
-override light_red: f32 = 0.0;
-override light_green: f32 = 0.0;
+override light_red: f32 = 0.15;
+override light_green: f32 = 0.08;
 override light_blue: f32 = 0.0;
 override reflections: bool = true;
 override reflection_strength: f32 = 0.5;

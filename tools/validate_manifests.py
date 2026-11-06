@@ -47,13 +47,20 @@ def check(manifest, base):
     # Strict TOML parse first — same rejection the app does (duplicate keys,
     # bad syntax). This is what caught v0.1.5's duplicate [sky].
     try:
-        tomllib.loads(text)
+        data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as e:
         errs.append(f'TOML parse error: {e}')
         print(f"FAIL {name}")
         for e2 in errs:
             print(f"   - {e2}")
         return False
+
+    # Duplicate [[options]] ids are legal TOML (array of tables) but collide in
+    # the app's override pipeline — check them here.
+    opt_ids = [o.get("id") for o in data.get("options", [])]
+    dup = sorted({i for i in opt_ids if opt_ids.count(i) > 1})
+    if dup:
+        errs.append(f'duplicate option ids: {dup}')
 
     api = field(text.splitlines(), 'api') if False else re.search(r'^api = "([^"]*)"', text, re.M)
     api = api.group(1) if api else None

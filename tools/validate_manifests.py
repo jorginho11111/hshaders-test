@@ -117,6 +117,7 @@ def check(manifest, base):
     SECTION_KEYS = {
         "budget": {"gpu_ms"},
         "reflection": {"option"},
+        "shadow": {"resolution", "distance", "solid_materials"},
     }
     for sname, body in secs:
         if sname not in SECTION_KEYS:
@@ -185,6 +186,10 @@ def check(manifest, base):
     if len(opt_ids) != len(set(opt_ids)):
         errs.append('duplicate option ids')
 
+    # [[pages]] (tabs/topics): known ids, each page id once, items are option or
+    # page ids only, and every page + option is reached from the first page.
+    check_pages(data, opt_ids, errs, name)
+
     used = set()
     for f in files:
         if not f.endswith(('shared.wgsl', 'common.wgsl')):
@@ -198,8 +203,45 @@ def check(manifest, base):
     return not errs
 
 
+
+def check_pages(data, opt_ids, errs, name):
+    pages = data.get("pages") or []
+    page_ids = [p.get("id") for p in pages]
+    if len(page_ids) != len(set(page_ids)):
+        dups = sorted(i for i in page_ids if page_ids.count(i) > 1)
+        errs.append(f'[[pages]] duplicate page ids: {dups}')
+        return
+    if not pages:
+        return
+    opt_id_set = set(opt_ids)
+    page_items = {}          # page id -> set of option ids on it
+    for page in pages:
+        pid = page.get("id")
+        items = page.get("items") or []
+        seen_on_page = set()
+        for item in items:
+            if item not in opt_id_set:
+                errs.append(f'[[pages]] {pid}: unknown item {item!r} (not an option id)')
+                continue
+            if item in seen_on_page:
+                errs.append(f'[[pages]] {pid}: option {item!r} listed twice on the same page')
+            seen_on_page.add(item)
+        page_items[pid] = seen_on_page
+    # every option must appear on exactly one page
+    all_on_pages = set()
+    for pid, items in page_items.items():
+        dup_across = all_on_pages & items
+        if dup_across:
+            errs.append(f'[[pages]] option(s) on more than one page: {sorted(dup_across)}')
+        all_on_pages |= items
+    missing = opt_id_set - all_on_pages
+    if missing:
+        errs.append(f'[[pages]] options not listed on any page: {sorted(missing)}')
+
+
 if __name__ == "__main__":
     ok = check("mellow/horizon-shaders.toml", "mellow")
     for d in sorted(glob.glob("probes/probe-*/")):
         ok &= check(os.path.join(d, "horizon-shaders.toml"), d.rstrip("/"))
     sys.exit(0 if ok else 1)
+

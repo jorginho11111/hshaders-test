@@ -180,9 +180,9 @@ if __name__ == "__main__":
     args = ap.parse_args()
     os.makedirs(DIST, exist_ok=True)
     if args.preset:
-        build_pack("mellow", preset=args.preset)
+        build_pack("water_walk", preset=args.preset)
     else:
-        build_pack("mellow")            # plain 0.1.8 pack
+        build_pack("water_walk")        # plain 0.1.8 pack
         for p in sorted(PRESETS):       # the two presets
-            build_pack("mellow", preset=p)
+            build_pack("water_walk", preset=p)
     build_probes()

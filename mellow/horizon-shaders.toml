@@ -347,7 +347,7 @@ id = "luz"
 name = "Luz / material"
 description = "Como a luz cai nos blocos: queda, brilho mínimo, cor da luz."
 columns = 2
-items = ["light_falloff", "min_light", "light_red", "light_green", "light_blue", "[nevoa]", "[reflexos]", "[ceu]", "[clima]", "[bloom]", "[grade]"]
+items = ["light_falloff", "min_light", "light_red", "light_green", "light_blue"]
 
 [[pages]]
 id = "nevoa"

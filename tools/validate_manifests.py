@@ -5,7 +5,7 @@ rules (crates/horizon-shader-api/src/manifest.rs `Manifest::parse` + `RawOption:
 Run from the repo root: python3 tools/validate_manifests.py
 Exit 0 = every manifest the app would accept.
 """
-import os, re, glob, sys
+import os, re, glob, sys, tomllib
 
 API = "0.1"            # exact match ("this Horizon serves 0.1")
 SCHEMA = "1"
@@ -43,6 +43,17 @@ def check(manifest, base):
     text = open(manifest).read()
     errs = []
     name = os.path.relpath(manifest)
+
+    # Strict TOML parse first — same rejection the app does (duplicate keys,
+    # bad syntax). This is what caught v0.1.5's duplicate [sky].
+    try:
+        tomllib.loads(text)
+    except tomllib.TOMLDecodeError as e:
+        errs.append(f'TOML parse error: {e}')
+        print(f"FAIL {name}")
+        for e2 in errs:
+            print(f"   - {e2}")
+        return False
 
     api = field(text.splitlines(), 'api') if False else re.search(r'^api = "([^"]*)"', text, re.M)
     api = api.group(1) if api else None

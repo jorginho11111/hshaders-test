@@ -6,10 +6,11 @@
 # weather and post. The "errors" that kept them off (app closing, "count was
 # 19, limit is 16") were the app's OPENGL ES backend; on Vulkan everything
 # runs. The post stays as ONE merged pass (fewer draws than the old chain).
+# v0.1.6: fixes v0.1.5's import failure (a duplicate [sky] key in this file).
 schema = 1
 id = "mellow"
 name = "Mellow"
-version = "0.1.5"
+version = "0.1.6"
 api = "0.1"
 description = "A painterly, gameplay-first conversion of Mellow Shaders: shaped light, vivid colour grading, soft bloom, sky, water reflections and weather."
 authors = ["TheCMK (original Mellow shaderpack)", "Horizon WGSL conversion"]
@@ -124,21 +125,7 @@ min = 0.0
 max = 2.0
 step = 0.25
 
-# --- Lighting (lightmap shadows, light colours, reflections) ---
-
-[sky]
-file = "sky.wgsl"
-name = "Mellow Sky"
-clouds = false
-sun = true
-stars = false
-
-[budget]
-gpu_ms = 0.2
-
 # --- Lighting (lightmap shaping, colours, reflections, fog) ---
-
-# --- Lighting (Mellow's composite colours and the light shaping) ---
 
 [[options]]
 id = "light_falloff"
@@ -216,9 +203,6 @@ default = 0.25
 min = 0.0
 max = 1.0
 step = 0.05
-
-[reflection]
-option = "reflections"
 
 # --- Weather ---
 

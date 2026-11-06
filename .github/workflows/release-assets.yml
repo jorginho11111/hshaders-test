@@ -1,0 +1,51 @@
+# Builds the .hshader downloads and attaches them to the matching GitHub
+# release. Runs here because release-asset uploads (uploads.github.com) are
+# not reachable from the conversion sandbox; GitHub's own runners can.
+#
+# - dist/mellow-<version>.hshader + dist/probe-*.hshader go to the release
+#   `mellow-v<version>` of the pushed tree (created here if missing).
+# - Older releases are backfilled from the .hshader files committed at their tags.
+name: release-assets
+
+on:
+  push:
+    branches: [arena/a860bcb4-hshaders-test]
+
+permissions:
+  contents: write
+
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build .hshader downloads
+        run: python3 tools/build_hshader.py
+
+      - name: Upload to the matching release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(python3 -c "import re;print(re.search(r'^version = \"(.*)\"', open('mellow/horizon-shaders.toml').read(), re.M).group(1))")
+          TAG="mellow-v$VERSION"
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "Mellow for Horizon $VERSION" \
+              --notes "Assets built from $GITHUB_SHA (notes updated from the conversion session)."
+          gh release upload "$TAG" dist/*.hshader --clobber
+
+      - name: Backfill older releases from their tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          if gh release view mellow-v0.1.0 >/dev/null 2>&1; then
+            git show mellow-v0.1.0:mellow-0.1.0.hshader > /tmp/mellow-0.1.0.hshader
+            gh release upload mellow-v0.1.0 /tmp/mellow-0.1.0.hshader --clobber
+          fi
+          if gh release view mellow-v0.1.1 >/dev/null 2>&1; then
+            git show mellow-v0.1.1:mellow-0.1.1.hshader > /tmp/mellow-0.1.1.hshader
+            gh release upload mellow-v0.1.1 /tmp/mellow-0.1.1.hshader --clobber
+          fi

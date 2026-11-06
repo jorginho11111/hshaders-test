@@ -1,0 +1,106 @@
+schema = 1
+id = "probe_sky"
+name = "Probe Sky"
+version = "0.0.1"
+api = "0.1"
+description = "Crash-bisect probe for Horizon Android 0.7.7 (only the sky stage of the Mellow pack)."
+authors = ["TheCMK (original Mellow Shaders)", "conversion: jorginho11111"]
+license = "MIT"
+shared = ["shared.wgsl"]
+
+[[options]]
+id = "sky_warmth"
+name = "Sky warmth"
+description = "How warm the sky turns around a low sun (Mellow's painterly sunrise and sunset)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "rain_sky_desaturation"
+name = "Rain sky desaturation"
+description = "How grey the sky goes while it rains (RAIN_SKY_DESATURATION)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "rain_sky_darkening"
+name = "Rain sky darkening"
+description = "How dark the sky goes while it rains (RAIN_SKY_DARKENING)."
+type = "float"
+default = 0.33
+min = 0.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "cloud_opacity"
+name = "Cloud opacity"
+description = "How strongly Mellow's soft clouds show (CLOUD_OPACITY)."
+type = "float"
+default = 0.24
+min = 0.0
+max = 0.4
+step = 0.02
+
+[[options]]
+id = "cloud_amount"
+name = "Cloud amount"
+description = "How much of the sky the clouds cover (CLOUD_AMOUNT)."
+type = "int"
+default = 22
+min = 12
+max = 26
+
+[[options]]
+id = "cloud_speed"
+name = "Cloud speed"
+description = "How fast the clouds drift (CLOUD_SPEED)."
+type = "int"
+default = 2
+min = 0
+max = 6
+
+[[options]]
+id = "aurora"
+name = "Aurora"
+description = "Mellow's aurora borealis at night (AURORA_BOREALIS)."
+type = "bool"
+default = true
+
+[[options]]
+id = "aurora_strength"
+name = "Aurora strength"
+description = "How bright the aurora hangs (AURORA_STRENGTH)."
+type = "float"
+default = 0.2
+min = 0.1
+max = 0.5
+step = 0.05
+
+[[options]]
+id = "star_strength"
+name = "Star strength"
+description = "How bright Mellow's own stars are (STAR_STRENGTH)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 2.0
+step = 0.25
+
+# --- Lighting (lightmap shadows, light colours, reflections) ---
+
+[sky]
+file = "sky.wgsl"
+name = "Mellow Sky"
+clouds = false
+sun = true
+stars = false
+
+[budget]
+gpu_ms = 0.2

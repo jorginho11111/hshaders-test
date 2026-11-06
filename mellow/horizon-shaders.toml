@@ -1,0 +1,335 @@
+# Mellow for Horizon — a conversion of Mellow Shaders (Iris/OptiFine, GLSL)
+# to the Horizon shader API (WGSL), schema 1.
+# Original: "Mellow" by TheCMK, https://codeberg.org/TheCMK/mellow-shader (MIT).
+#
+# v0.1.5: ALL stages are back — sky, material (light, water reflections, fog),
+# weather and post. The "errors" that kept them off (app closing, "count was
+# 19, limit is 16") were the app's OPENGL ES backend; on Vulkan everything
+# runs. The post stays as ONE merged pass (fewer draws than the old chain).
+# v0.1.6: fixes v0.1.5's import failure (a duplicate [sky] key in this file).
+# v0.1.7: fixes v0.1.6's import failure ([budget] used invented fields; the
+# app's [budget] only takes gpu_ms — the GPU milliseconds the pack aims to
+# add to a frame, shown by the over-budget overlay).
+schema = 1
+id = "mellow"
+name = "Mellow"
+version = "0.1.7"
+api = "0.1"
+description = "A painterly, gameplay-first conversion of Mellow Shaders: shaped light, vivid colour grading, soft bloom, sky, water reflections and weather."
+authors = ["TheCMK (original Mellow shaderpack)", "Horizon WGSL conversion"]
+license = "MIT"
+shared = ["shared.wgsl"]
+
+[material]
+file = "material.wgsl"
+name = "Mellow lighting"
+fog = false
+
+[weather]
+file = "weather.wgsl"
+name = "Mellow weather"
+
+[sky]
+file = "sky.wgsl"
+name = "Mellow sky"
+clouds = false
+sun = true
+stars = false
+
+# One post pass (bloom + tone map + grade) — merged for speed: one draw
+# instead of the old glow -> grade chain, same picture.
+[[post]]
+file = "post_final.wgsl"
+name = "Bloom, tone map and grade"
+
+# --- Sky ---
+[[options]]
+id = "sky_warmth"
+name = "Sky warmth"
+description = "How warm the sky turns around a low sun (Mellow's painterly sunrise and sunset)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "rain_sky_desaturation"
+name = "Rain sky desaturation"
+description = "How grey the sky goes while it rains (RAIN_SKY_DESATURATION)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "rain_sky_darkening"
+name = "Rain sky darkening"
+description = "How dark the sky goes while it rains (RAIN_SKY_DARKENING)."
+type = "float"
+default = 0.33
+min = 0.0
+max = 1.0
+step = 0.01
+
+[[options]]
+id = "cloud_opacity"
+name = "Cloud opacity"
+description = "How strongly Mellow's soft clouds show (CLOUD_OPACITY)."
+type = "float"
+default = 0.24
+min = 0.0
+max = 0.4
+step = 0.02
+
+[[options]]
+id = "cloud_amount"
+name = "Cloud amount"
+description = "How much of the sky the clouds cover (CLOUD_AMOUNT)."
+type = "int"
+default = 22
+min = 12
+max = 26
+
+[[options]]
+id = "cloud_speed"
+name = "Cloud speed"
+description = "How fast the clouds drift (CLOUD_SPEED)."
+type = "int"
+default = 2
+min = 0
+max = 6
+
+[[options]]
+id = "aurora"
+name = "Aurora"
+description = "Mellow's aurora borealis at night (AURORA_BOREALIS)."
+type = "bool"
+default = true
+
+[[options]]
+id = "aurora_strength"
+name = "Aurora strength"
+description = "How bright the aurora hangs (AURORA_STRENGTH)."
+type = "float"
+default = 0.2
+min = 0.1
+max = 0.5
+step = 0.05
+
+[[options]]
+id = "star_strength"
+name = "Star strength"
+description = "How bright Mellow's own stars are (STAR_STRENGTH)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 2.0
+step = 0.25
+
+# --- Lighting (lightmap shaping, colours, reflections, fog) ---
+
+[[options]]
+id = "light_falloff"
+name = "Light falloff"
+description = "How softly light fades with distance (light_falloff, 1 is linear, 2 quadratic)."
+type = "float"
+default = 1.6
+min = 0.5
+max = 2.0
+step = 0.1
+
+[[options]]
+id = "min_light"
+name = "Min light"
+description = "Never-full-dark floors, as in Mellow (min_light)."
+type = "float"
+default = 0.15
+min = 0.0
+max = 0.5
+step = 0.01
+
+[[options]]
+id = "light_red"
+name = "Warm light red"
+description = "Boosts the red channel of block light (0 is neutral; torch light ~0.6)."
+type = "float"
+default = 0.0
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "light_green"
+name = "Warm light green"
+description = "Boosts the green channel of block light (0 is neutral)."
+type = "float"
+default = 0.0
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "light_blue"
+name = "Warm light blue"
+description = "Boosts the blue channel of block light (0 is neutral)."
+type = "float"
+default = 0.0
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "reflections"
+name = "Water reflections"
+description = "Reflect the world on water, with Mellow's ripples (REFLECTION)."
+type = "bool"
+default = true
+
+[[options]]
+id = "reflection_strength"
+name = "Reflection strength"
+description = "How shiny the water is (reflectionStrength)."
+type = "float"
+default = 0.5
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "atmospheric_fog"
+name = "Atmospheric fog"
+description = "Sun-tinted distance fog (Mellow's applyFog)."
+type = "float"
+default = 0.25
+min = 0.0
+max = 1.0
+step = 0.05
+
+# --- Weather ---
+
+[[options]]
+id = "weather_opacity"
+name = "Weather opacity"
+description = "How strongly rain and snow streaks show."
+type = "float"
+default = 1.0
+min = 0.1
+max = 1.0
+step = 0.05
+
+# --- Bloom (BLOOM_STRENGTH, BLOOM_CURVE) ---
+
+[[options]]
+id = "bloom_strength"
+name = "Bloom strength"
+description = "The soft halo around bright things (BLOOM_STRENGTH)."
+type = "float"
+default = 0.4
+min = 0.0
+max = 0.8
+step = 0.02
+
+[[options]]
+id = "bloom_curve"
+name = "Bloom curve"
+description = "Where bloom starts to pick up brightness (BLOOM_CURVE)."
+type = "float"
+default = 0.5
+min = 0.1
+max = 1.0
+step = 0.05
+
+# --- Tone map and colour grade (Mellow's final pass) ---
+
+[[options]]
+id = "tonemap"
+name = "Tone mapping"
+description = "Uchimura is Mellow's default operator; AgX Punchy and the fitted ACES curve are two of its others."
+type = "choice"
+values = ["Uchimura", "AgX Punchy", "ACES", "None"]
+default = "Uchimura"
+
+[[options]]
+id = "exposure"
+name = "Exposure"
+description = "How bright the tone mapper starts from."
+type = "float"
+default = 1.1
+min = 0.5
+max = 2.0
+step = 0.05
+
+[[options]]
+id = "vibrance"
+name = "Vibrance"
+description = "Lifts the colours that are not already loud (Mellow's apply_vibrance)."
+type = "float"
+default = 1.2
+min = 0.5
+max = 1.5
+step = 0.05
+
+[[options]]
+id = "saturation"
+name = "Saturation"
+description = "Colour strength (Mellow's apply_saturation)."
+type = "float"
+default = 1.0
+min = 0.5
+max = 1.5
+step = 0.05
+
+[[options]]
+id = "contrast"
+name = "Contrast"
+description = "Light and shadow separation (Mellow's apply_contrast)."
+type = "float"
+default = 1.0
+min = 0.7
+max = 1.3
+step = 0.02
+
+[[options]]
+id = "vignette_opacity"
+name = "Vignette opacity"
+description = "How dark the picture's edges get (0 disables)."
+type = "float"
+default = 0.0
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "vignette_falloff"
+name = "Vignette falloff"
+description = "How far the vignette reaches inward."
+type = "float"
+default = 0.75
+min = 0.25
+max = 1.75
+step = 0.05
+
+[[options]]
+id = "film_grain"
+name = "Film grain"
+description = "Adds the film grain effect to the final image."
+type = "bool"
+default = false
+
+[[options]]
+id = "film_grain_strength"
+name = "Film grain strength"
+description = "How strong the film grain appears."
+type = "float"
+default = 0.05
+min = 0.01
+max = 0.5
+step = 0.01
+
+[reflection]
+option = "reflections"
+
+[budget]
+gpu_ms = 2.0

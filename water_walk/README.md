@@ -37,12 +37,10 @@ eram limites e panics do backend GLES do app, não do pacote.
 
 Put this folder in `shaderpacks/` beside `options.txt`, or download the
 `.hshader` assets from the release's **Assets** (download direto) and import
-one from the launcher's Shaders page, then pick **Water Walk** on
+from the launcher's Shaders page, then pick **Water Walk** on
 Options > Horizon Settings > Shader Packs:
 
-- `water_walk-0.1.8.hshader` — plain pack, warm-light defaults.
-- `water_walk-batata-0.1.8.hshader` — batata preset (heavy effects off, lag-free).
-- `water_walk-editavel-0.1.8.hshader` — editável preset (the user's normal-Mellow values).
+- `water_walk-0.1.8.hshader` — pack único com os padrões do usuário (luz quente, sem efeitos pesados).
 
 Every knob of the original that maps to this API is on the pack's options
 page, named after the `#define` it came from.
@@ -51,19 +49,19 @@ page, named after the `#define` it came from.
 
 | Mellow (GLSL) | Here (WGSL) |
 | --- | --- |
-| `final.fsh` grade: vibrance 1.2, saturation 1.0, contrast 1.0 | `post_grade.wgsl`, same formulas and defaults |
+| `final.fsh` grade: vibrance 1.2, saturation 1.1, contrast 1.0 | `post_grade.wgsl`, same formulas and defaults |
 | Tone maps (8 operators; default `TONEMAP_OPERATOR 6` = Uchimura) | `shared.wgsl`: Uchimura (default), AgX Punchy, ACES |
 | Vignette (`VIGNETTE_FALLOFF 0.75`, `VIGNETTE_OPACITY 0`, off by default) | `post_grade.wgsl`, same formula and defaults |
 | Film grain (`FILM_GRAIN` off, `FILM_GRAIN_STRENGTH 0.05`) | `post_grade.wgsl`, off by default |
 | The always-on dither of `final.fsh` | `post_grade.wgsl` |
-| Bloom (`BLOOM_STRENGTH 0.4`, `BLOOM_CURVE 0.5`) | `post_glow.wgsl` (two-ring halo) |
+| Bloom (`BLOOM_STRENGTH 0.0`, `BLOOM_CURVE 0.5`) | `post_glow.wgsl` (two-ring halo) |
 | Lightmap shadows (`LM_FALLOFF_CURVE 1.6`) and `MIN_LIGHT_AMOUNT 0.15` | `material.wgsl` |
 | Adjustable light colours (`LM_RED/GREEN/BLUE`) | `material.wgsl` options |
 | Reflections on water | `material.wgsl` + `[reflection]` |
-| `ATM_FOG_STRENGTH 0.25` ambient fog | `material.wgsl` |
+| `ATM_FOG_STRENGTH 0.0` ambient fog | `material.wgsl` |
 | Rainy sky (`RAIN_SKY_DESATURATION 0.5`, `RAIN_SKY_DARKENING 0.33`) | `sky.wgsl` |
-| Clouds (`CLOUD_AMOUNT 22`, `CLOUD_OPACITY 0.24`, `CLOUD_SPEED 2`) | `sky.wgsl`, its own soft clouds |
-| Shader stars (`STAR_STRENGTH 0.5`) and aurora (`AURORA_STRENGTH 0.2`) | `sky.wgsl` |
+| Clouds (`CLOUD_AMOUNT 26`, `CLOUD_OPACITY 0.4`, `CLOUD_SPEED 2`) | `sky.wgsl`, its own soft clouds |
+| Shader stars (`STAR_STRENGTH 0.1`) and aurora (`AURORA_STRENGTH 0.2`, off) | `sky.wgsl` |
 | Weather streaks | `weather.wgsl` |
 
 ## What did not convert (and why)
@@ -105,3 +103,4 @@ check (20 000 expressions and 64 texture reads a stage).
   generator; the "Punchy" look parameters are Mellow's.
 - The bloom pass follows the pattern of Horizon's own `golden_hour` example
   pack (MIT, Horizon).
+# Release notes regenerated Sat Nov  7 12:17:40 UTC 2026

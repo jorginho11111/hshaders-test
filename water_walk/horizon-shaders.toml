@@ -10,8 +10,8 @@
 # v0.1.7: fixes v0.1.6's import failure ([budget] used invented fields; the
 # app's [budget] only takes gpu_ms — the GPU milliseconds the pack aims to
 # add to a frame, shown by the over-budget overlay).
-# v0.1.8: warm light defaults (light_red/green/blue), exactly two presets:
-# batata (heavy effects off, lag-free) and editavel (the user's own normal-Mellow values).
+# v0.1.8: warm light defaults (light_red/green/blue), exactly one preset:
+# editavel (the user's own normal-Mellow values as defaults).
 # Pack renamed to Water Walk.
 schema = 1
 id = "water_walk"
@@ -81,7 +81,7 @@ id = "cloud_opacity"
 name = "Cloud opacity"
 description = "How strongly Mellow's soft clouds show (CLOUD_OPACITY)."
 type = "float"
-default = 0.24
+default = 0.4
 min = 0.0
 max = 0.4
 step = 0.02
@@ -91,7 +91,7 @@ id = "cloud_amount"
 name = "Cloud amount"
 description = "How much of the sky the clouds cover (CLOUD_AMOUNT)."
 type = "int"
-default = 22
+default = 26
 min = 12
 max = 26
 
@@ -109,7 +109,7 @@ id = "aurora"
 name = "Aurora"
 description = "Mellow's aurora borealis at night (AURORA_BOREALIS)."
 type = "bool"
-default = true
+default = false
 
 [[options]]
 id = "aurora_strength"
@@ -126,7 +126,7 @@ id = "star_strength"
 name = "Star strength"
 description = "How bright Mellow's own stars are (STAR_STRENGTH)."
 type = "float"
-default = 0.5
+default = 0.1
 min = 0.0
 max = 2.0
 step = 0.25
@@ -205,7 +205,7 @@ id = "atmospheric_fog"
 name = "Atmospheric fog"
 description = "Sun-tinted distance fog (Mellow's applyFog)."
 type = "float"
-default = 0.25
+default = 0.0
 min = 0.0
 max = 1.0
 step = 0.05
@@ -217,7 +217,7 @@ id = "weather_opacity"
 name = "Weather opacity"
 description = "How strongly rain and snow streaks show."
 type = "float"
-default = 1.0
+default = 0.1
 min = 0.1
 max = 1.0
 step = 0.05
@@ -229,7 +229,7 @@ id = "bloom_strength"
 name = "Bloom strength"
 description = "The soft halo around bright things (BLOOM_STRENGTH)."
 type = "float"
-default = 0.4
+default = 0.0
 min = 0.0
 max = 0.8
 step = 0.02
@@ -279,7 +279,7 @@ id = "saturation"
 name = "Saturation"
 description = "Colour strength (Mellow's apply_saturation)."
 type = "float"
-default = 1.0
+default = 1.1
 min = 0.5
 max = 1.5
 step = 0.05

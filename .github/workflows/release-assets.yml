@@ -9,7 +9,7 @@ name: release-assets
 
 on:
   push:
-    branches: [arena/64ec2691-hshaders-test]
+    branches: [arena/6818517f-hshaderos-test]
 
 permissions:
   contents: write

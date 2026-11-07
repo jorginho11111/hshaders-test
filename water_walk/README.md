@@ -103,3 +103,4 @@ check (20 000 expressions and 64 texture reads a stage).
   generator; the "Punchy" look parameters are Mellow's.
 - The bloom pass follows the pattern of Horizon's own `golden_hour` example
   pack (MIT, Horizon).
+# Release notes regenerated Sat Nov  7 12:17:40 UTC 2026
